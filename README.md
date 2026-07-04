@@ -36,8 +36,22 @@ Copy `.env.example` → `.env.local`. All variables are optional:
 |---|---|---|
 | `MONGODB_URI` | *(unset → embedded local MongoDB)* | Point at your own `mongod` or hosted instance |
 | `MONGODB_DB` | `fablefile` | Database name |
+| `AUTH_SECRET` | *(unset)* | NextAuth session secret (`npx auth secret`) |
+| `AUTH_GOOGLE_ID` / `AUTH_GOOGLE_SECRET` | *(unset → button disabled)* | Google OAuth client |
+| `AUTH_APPLE_ID` / `AUTH_APPLE_SECRET` | *(unset → button disabled)* | Sign in with Apple |
 
 No secrets are hardcoded anywhere; config is read from `process.env`.
+
+### OAuth (scaffolded)
+
+Real OAuth rides on **NextAuth v5 (Auth.js)** at `/api/auth/[...nextauth]`
+(`src/services/oauth.ts`), coexisting with the mock email login — the
+explicit `/api/auth/login` and `/api/auth/signup` routes stay ahead of the
+catch-all. Providers activate purely through env vars: without credentials
+the "Continue with Google / Apple" buttons in the auth modal render
+disabled and the mock flow is untouched. The account-linking bridge point
+(upsert a `User` by verified email, hand its key to `AuthContext`) is
+marked in `src/services/oauth.ts`.
 
 ## Scripts
 

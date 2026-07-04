@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ChefHat, UtensilsCrossed, X, LogIn, UserPlus } from "lucide-react";
+import { signIn as oauthSignIn } from "next-auth/react";
+import { Apple, ChefHat, Globe, UtensilsCrossed, X, LogIn, UserPlus } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useFetch } from "@/hooks/useFetch";
 import { Avatar } from "./Avatar";
@@ -37,6 +38,10 @@ export function AuthModal() {
   // Demo directory for the mock login quick-select
   const { data: directory } = useFetch<{ users: DirectoryUser[] }>(
     open && mode === "login" ? "/api/users" : null
+  );
+  // Which OAuth providers have credentials (scaffolding stays disabled without them)
+  const { data: oauthStatus } = useFetch<{ google: boolean; apple: boolean }>(
+    open ? "/api/auth/oauth-status" : null
   );
 
   useEffect(() => {
@@ -235,6 +240,48 @@ export function AuthModal() {
               </p>
             )}
           </form>
+
+          {/* OAuth entry points — scaffolded; buttons activate once provider
+              credentials exist in .env.local (see .env.example) */}
+          <div className="my-4 flex items-center gap-3">
+            <span className="h-px flex-1 bg-zinc-200" />
+            <span className="text-[11px] font-semibold uppercase tracking-wider text-zinc-400">
+              or continue with
+            </span>
+            <span className="h-px flex-1 bg-zinc-200" />
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            {(
+              [
+                { key: "google" as const, label: "Google", Icon: Globe },
+                { key: "apple" as const, label: "Apple", Icon: Apple },
+              ]
+            ).map(({ key, label, Icon }) => {
+              const enabled = oauthStatus?.[key] === true;
+              return (
+                <button
+                  key={key}
+                  type="button"
+                  disabled={!enabled || busy}
+                  onClick={() => oauthSignIn(key)}
+                  title={
+                    enabled
+                      ? `Continue with ${label}`
+                      : `Add AUTH_${key.toUpperCase()}_ID and AUTH_${key.toUpperCase()}_SECRET to .env.local to enable`
+                  }
+                  className="inline-flex items-center justify-center gap-2 rounded-md border border-zinc-200 bg-white py-2.5 text-sm font-semibold text-zinc-700 transition-colors hover:border-zinc-400 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  <Icon size={15} />
+                  {label}
+                </button>
+              );
+            })}
+          </div>
+          {oauthStatus && !oauthStatus.google && !oauthStatus.apple && (
+            <p className="mt-2 text-center text-[11px] text-zinc-400">
+              OAuth is scaffolded — add provider credentials in .env.local to activate.
+            </p>
+          )}
 
           {mode === "login" && directory?.users && (
             <div className="mt-5">
