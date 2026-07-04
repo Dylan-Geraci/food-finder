@@ -27,6 +27,23 @@ body {
   background: #fbe3d1;
 }
 
+/* Dropdown/popover entrance — one crisp reveal, honored nowhere else */
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+.menu-pop {
+  transform-origin: top right;
+  animation: menu-in 130ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  .menu-pop {
+    animation: none;
+  }
+}
+
 /* Hide scrollbars on horizontal chip/card rails without disabling scroll */
 .rail {
   scrollbar-width: none;

@@ -1,10 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { MapPin, Map as MapIcon, LogOut } from "lucide-react";
+import { MapPin, Map as MapIcon } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MARKET_NAME } from "@/services/market";
-import { Avatar } from "./Avatar";
+import { UserMenu } from "./UserMenu";
 
 /**
  * Top navigation — wordmark, delivery area, auth entry.
@@ -12,7 +12,7 @@ import { Avatar } from "./Avatar";
  * filter bar can lock cleanly to the top of the viewport with no gap.
  */
 export function Navbar() {
-  const { status, user, openAuth, logout } = useAuth();
+  const { status, user, openAuth } = useAuth();
 
   return (
     <header className="border-b border-zinc-200 bg-white">
@@ -36,25 +36,7 @@ export function Navbar() {
           </Link>
 
           {status === "authed" && user ? (
-            <>
-              <Link
-                href="/profile"
-                className="flex items-center gap-2 rounded-md px-2 py-1.5 transition-colors hover:bg-zinc-100"
-              >
-                <Avatar name={user.name} size="sm" tone="accent" />
-                <span className="hidden text-sm font-medium text-zinc-800 lg:inline">
-                  {user.role === "cook" ? user.kitchenName ?? user.name : user.name}
-                </span>
-              </Link>
-              <button
-                onClick={logout}
-                aria-label="Log out"
-                title="Log out"
-                className="rounded-md p-2 text-zinc-500 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
-              >
-                <LogOut size={16} />
-              </button>
-            </>
+            <UserMenu />
           ) : (
             <>
               <button
