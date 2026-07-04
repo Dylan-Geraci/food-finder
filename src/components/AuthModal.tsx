@@ -204,7 +204,7 @@ export function AuthModal() {
                 <input
                   value={locationLabel}
                   onChange={(e) => setLocationLabel(e.target.value)}
-                  placeholder="Neighborhood (e.g. Hyde Park, Austin)"
+                  placeholder="Neighborhood (e.g. Little Arabia, Anaheim)"
                   className={inputClass}
                 />
               </>

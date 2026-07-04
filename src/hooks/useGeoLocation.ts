@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import type { LatLng } from "@/services/geo";
+import { MARKET_CENTER } from "@/services/market";
 
-/** Austin, TX — matches the seeded mock data's neighborhood. */
-export const DEFAULT_CENTER: LatLng = { lat: 30.2711, lng: -97.7437 };
+/** Falls back to the mock market's center (see services/market). */
+export const DEFAULT_CENTER: LatLng = MARKET_CENTER;
 
 export type GeoStatus = "idle" | "locating" | "granted" | "denied" | "unavailable";
 

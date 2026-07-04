@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { MapPin, Map as MapIcon, LogOut } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { MARKET_NAME } from "@/services/market";
 import { Avatar } from "./Avatar";
 
 /**
@@ -22,7 +23,7 @@ export function Navbar() {
 
         <span className="hidden items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-700 sm:inline-flex">
           <MapPin size={15} className="text-accent-600" />
-          Austin, TX
+          {MARKET_NAME}
         </span>
 
         <nav className="ml-auto flex items-center gap-1.5 sm:gap-2">

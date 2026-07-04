@@ -1,7 +1,7 @@
 {
   "city": {
-    "name": "Austin, TX",
-    "center": { "lat": 30.2711, "lng": -97.7437 }
+    "name": "Los Angeles, CA",
+    "center": { "lat": 33.7701, "lng": -118.1937 }
   },
   "users": [
     { "key": "maria", "name": "Maria Delgado", "email": "maria@example.com", "role": "cook", "addresses": [] },
@@ -14,30 +14,30 @@
       "key": "dylan", "name": "Dylan G.", "email": "dylan@example.com", "role": "diner",
       "favorites": ["maria", "amara"],
       "addresses": [
-        { "label": "Home", "line1": "1204 Willow St", "city": "Austin, TX 78702", "isDefault": true },
-        { "label": "Work", "line1": "500 W 2nd St, Floor 14", "city": "Austin, TX 78701", "isDefault": false }
+        { "label": "Home", "line1": "410 E Broadway", "city": "Long Beach, CA 90802", "isDefault": true },
+        { "label": "Work", "line1": "18575 Jamboree Rd, Floor 6", "city": "Irvine, CA 92612", "isDefault": false }
       ]
     },
     {
       "key": "sofia", "name": "Sofia Reyes", "email": "sofia@example.com", "role": "diner",
       "favorites": ["kenji"],
       "addresses": [
-        { "label": "Home", "line1": "2811 San Gabriel St, Apt 204", "city": "Austin, TX 78705", "isDefault": true }
+        { "label": "Home", "line1": "2145 Newport Blvd, Apt 204", "city": "Costa Mesa, CA 92627", "isDefault": true }
       ]
     },
     {
       "key": "marcus", "name": "Marcus Lee", "email": "marcus@example.com", "role": "diner",
       "favorites": ["tom", "kenji"],
       "addresses": [
-        { "label": "Home", "line1": "4507 Duval St", "city": "Austin, TX 78751", "isDefault": true }
+        { "label": "Home", "line1": "453 S Spring St, Apt 1108", "city": "Los Angeles, CA 90013", "isDefault": true }
       ]
     },
     {
       "key": "lena", "name": "Lena Brooks", "email": "lena@example.com", "role": "diner",
       "favorites": ["amara", "priya"],
       "addresses": [
-        { "label": "Home", "line1": "1900 Barton Springs Rd", "city": "Austin, TX 78704", "isDefault": true },
-        { "label": "Studio", "line1": "979 Springdale Rd, Bldg 2", "city": "Austin, TX 78702", "isDefault": false }
+        { "label": "Home", "line1": "1247 Ocean Park Blvd", "city": "Santa Monica, CA 90405", "isDefault": true },
+        { "label": "Studio", "line1": "8501 Washington Blvd", "city": "Culver City, CA 90232", "isDefault": false }
       ]
     }
   ],
@@ -47,7 +47,7 @@
       "kitchenName": "Casa Maria Kitchen",
       "bio": "Third-generation Tex-Mex recipes from my abuela's handwritten cards. Everything is made fresh the morning of pickup.",
       "portrait": "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?auto=format&fit=crop&w=400&q=60",
-      "location": { "lat": 30.2585, "lng": -97.7494, "label": "South Congress, Austin" },
+      "location": { "lat": 33.7455, "lng": -117.8677, "label": "Downtown Santa Ana" },
       "certifications": [
         { "name": "Food Handler Certificate", "status": "verified", "expiresOn": "2027-03-15" },
         { "name": "Cottage Food Permit", "status": "verified", "expiresOn": "2026-11-01" }
@@ -68,7 +68,7 @@
       "kitchenName": "Kenji's Comfort Bowls",
       "bio": "Japanese home cooking - donburi, curry, and slow-simmered comfort food. Small batches, big flavor.",
       "portrait": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=60",
-      "location": { "lat": 30.2749, "lng": -97.7404, "label": "Downtown Austin" },
+      "location": { "lat": 34.0195, "lng": -118.4912, "label": "Santa Monica" },
       "certifications": [
         { "name": "Food Handler Certificate", "status": "verified", "expiresOn": "2026-09-30" }
       ],
@@ -88,7 +88,7 @@
       "kitchenName": "Amara's West African Table",
       "bio": "Ghanaian and Nigerian classics: jollof, maafe, and stews that simmer all day. Spice levels adjustable.",
       "portrait": "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=60",
-      "location": { "lat": 30.2915, "lng": -97.7688, "label": "Clarksville, Austin" },
+      "location": { "lat": 34.0403, "lng": -118.2352, "label": "Arts District, DTLA" },
       "certifications": [
         { "name": "Food Handler Certificate", "status": "verified", "expiresOn": "2027-01-20" },
         { "name": "Allergen Awareness Training", "status": "verified", "expiresOn": "2026-08-12" }
@@ -109,7 +109,7 @@
       "kitchenName": "Priya's Spice Route",
       "bio": "South Indian home meals ground fresh daily - my masalas never come from a jar.",
       "portrait": "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=400&q=60",
-      "location": { "lat": 30.245, "lng": -97.7211, "label": "East Riverside, Austin" },
+      "location": { "lat": 33.6846, "lng": -117.8265, "label": "Woodbridge, Irvine" },
       "certifications": [
         { "name": "Food Handler Certificate", "status": "verified", "expiresOn": "2026-12-05" }
       ],
@@ -129,7 +129,7 @@
       "kitchenName": "Smoke & Oak BBQ Homestead",
       "bio": "Backyard offset smoker, post oak only. Brisket goes on at 4am - first come, first served.",
       "portrait": "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=400&q=60",
-      "location": { "lat": 30.3005, "lng": -97.722, "label": "Mueller, Austin" },
+      "location": { "lat": 33.6595, "lng": -117.9988, "label": "Huntington Beach" },
       "certifications": [
         { "name": "Food Handler Certificate", "status": "verified", "expiresOn": "2026-10-18" },
         { "name": "Open Flame / Smoker Permit", "status": "pending", "expiresOn": "" }
@@ -150,7 +150,7 @@
       "kitchenName": "Nadia's Levant Pantry",
       "bio": "Just opened! Syrian and Lebanese mezze, fresh pita, and weekly family-style trays.",
       "portrait": "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=60",
-      "location": { "lat": 30.2352, "lng": -97.7644, "label": "Barton Hills, Austin" },
+      "location": { "lat": 33.8366, "lng": -117.913, "label": "Little Arabia, Anaheim" },
       "certifications": [
         { "name": "Food Handler Certificate", "status": "pending", "expiresOn": "" }
       ],
@@ -203,7 +203,7 @@
     { "mealKey": "miso-salmon-bowl", "dinerKey": "lena", "stars": 4, "comment": "Delicious, wish the portion was a bit bigger.", "daysAgo": 12 },
     { "mealKey": "katsu-curry", "dinerKey": "marcus", "stars": 4.5, "comment": "Cutlet stayed crispy even after pickup. Curry is deep and savory.", "daysAgo": 5 },
     { "mealKey": "katsu-curry", "dinerKey": "dylan", "stars": 4.5, "comment": "Comfort food done right.", "daysAgo": 18 },
-    { "mealKey": "jollof-chicken", "dinerKey": "lena", "stars": 5, "comment": "The smokiness is unreal. Best jollof in Austin, full stop.", "daysAgo": 1 },
+    { "mealKey": "jollof-chicken", "dinerKey": "lena", "stars": 5, "comment": "The smokiness is unreal. Best jollof in LA, full stop.", "daysAgo": 1 },
     { "mealKey": "jollof-chicken", "dinerKey": "dylan", "stars": 5, "comment": "Plantains alone are worth it.", "daysAgo": 8 },
     { "mealKey": "maafe", "dinerKey": "sofia", "stars": 4.5, "comment": "Rich and comforting. Ask for extra shito.", "daysAgo": 11 },
     { "mealKey": "butter-chicken", "dinerKey": "marcus", "stars": 4.5, "comment": "Naan was fresh off the pan. Gravy is silky.", "daysAgo": 4 },

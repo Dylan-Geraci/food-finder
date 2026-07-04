@@ -12,6 +12,7 @@ import { toCookMarkers, useCooks } from "@/hooks/useCooks";
 import { useFetch } from "@/hooks/useFetch";
 import { useGeoLocation } from "@/hooks/useGeoLocation";
 import { distanceKm, formatDistance } from "@/services/geo";
+import { MARKET_NAME } from "@/services/market";
 import { computeAverage, roundRating } from "@/services/rating";
 
 const MapView = dynamic(() => import("@/components/MapView"), {
@@ -224,7 +225,7 @@ export default function LandingPage() {
                 ? "distances from your location"
                 : status === "locating"
                   ? "locating you..."
-                  : "showing Austin, TX"}
+                  : `showing ${MARKET_NAME}`}
             </p>
           </div>
         </div>
@@ -303,7 +304,7 @@ export default function LandingPage() {
           <span className="font-semibold text-zinc-500">
             Fable<span className="text-accent-600">Fare</span>
           </span>
-          <span>Home-cooked meal marketplace MVP &middot; Austin, TX</span>
+          <span>Home-cooked meal marketplace MVP &middot; Orange County &amp; Los Angeles</span>
         </div>
       </footer>
 

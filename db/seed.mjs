@@ -160,5 +160,10 @@ console.log(
     `${mock.meals.length} meals, ${mock.orders.length} orders, ${mock.reviews.length} reviews`
 );
 
+// The embedded mongod runs without journaling, and process shutdown on
+// Windows is a hard kill — force a WiredTiger checkpoint so every write
+// above actually reaches db/data before we stop the server.
+await db.admin().command({ fsync: 1 });
+
 await mongoose.disconnect();
 if (memoryServer) await memoryServer.stop();

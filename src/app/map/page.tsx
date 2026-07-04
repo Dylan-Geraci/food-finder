@@ -4,6 +4,7 @@ import dynamic from "next/dynamic";
 import { LocateFixed, MapPin } from "lucide-react";
 import { toCookMarkers, useCooks } from "@/hooks/useCooks";
 import { useGeoLocation } from "@/hooks/useGeoLocation";
+import { MARKET_NAME } from "@/services/market";
 
 // MapLibre touches `window`; skip SSR for the map itself.
 const MapView = dynamic(() => import("@/components/MapView"), {
@@ -46,7 +47,7 @@ export default function MapPage() {
               ? "Your location"
               : status === "locating"
                 ? "Locating..."
-                : "Austin, TX"}
+                : MARKET_NAME}
           </span>
         </div>
       </header>

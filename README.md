@@ -98,7 +98,8 @@ throughout — no emoji.
   fallback to the mock city center when location is denied).
 - **Seeding** — `db/mock-data.json` holds 10 users, 6 kitchens (one brand-new
   with zero reviews to exercise the edge case), 11 meals, and 18 historical
-  reviews around Austin, TX. Auto-seeds on first boot; `npm run seed` resets.
+  reviews across Orange County and Los Angeles, CA. Auto-seeds on first
+  boot; `npm run seed` resets.
 
 ## API
 
