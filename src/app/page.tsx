@@ -6,9 +6,9 @@ import dynamic from "next/dynamic";
 import { ArrowRight, LogIn, MapPin, Search, ShieldCheck, Star, Store, UserPlus } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MealCard, type MealCardData } from "@/components/MealCard";
-import { CookCard, type CookCardData } from "@/components/CookCard";
+import { CookCard } from "@/components/CookCard";
 import { QuickViewSheet } from "@/components/QuickViewSheet";
-import type { CookMarker } from "@/components/MapView";
+import { toCookMarkers, useCooks } from "@/hooks/useCooks";
 import { useFetch } from "@/hooks/useFetch";
 import { useGeoLocation } from "@/hooks/useGeoLocation";
 import { distanceKm, formatDistance } from "@/services/geo";
@@ -34,7 +34,7 @@ type MealWithLocation = MealCardData & {
 export default function LandingPage() {
   const { data: mealData, loading: mealsLoading } =
     useFetch<{ meals: MealWithLocation[] }>("/api/meals");
-  const { data: cookData } = useFetch<{ cooks: CookCardData[] }>("/api/cooks");
+  const { cooks: allCooks } = useCooks();
   const { position, isReal, status } = useGeoLocation();
   const { status: authStatus, openAuth } = useAuth();
 
@@ -65,8 +65,7 @@ export default function LandingPage() {
   );
 
   const cooks = useMemo(() => {
-    if (!cookData?.cooks) return [];
-    return [...cookData.cooks]
+    return [...allCooks]
       .map((c) => ({
         ...c,
         distanceLabel: formatDistance(distanceKm(position, c.location)),
@@ -74,17 +73,9 @@ export default function LandingPage() {
       .sort(
         (a, b) => distanceKm(position, a.location) - distanceKm(position, b.location)
       );
-  }, [cookData, position]);
+  }, [allCooks, position]);
 
-  const markers: CookMarker[] = cooks.map((c) => ({
-    id: c.id,
-    kitchenName: c.kitchenName,
-    lat: c.location.lat,
-    lng: c.location.lng,
-    ratingAvg: c.ratingAvg,
-    ratingCount: c.ratingCount,
-    activeMeals: c.activeMeals,
-  }));
+  const markers = toCookMarkers(cooks);
 
   const marketAvg = roundRating(
     computeAverage(cooks.filter((c) => c.ratingCount > 0).map((c) => c.ratingAvg))

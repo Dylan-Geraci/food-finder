@@ -2,9 +2,8 @@
 
 import dynamic from "next/dynamic";
 import { LocateFixed, MapPin } from "lucide-react";
-import { useFetch } from "@/hooks/useFetch";
+import { toCookMarkers, useCooks } from "@/hooks/useCooks";
 import { useGeoLocation } from "@/hooks/useGeoLocation";
-import type { CookMarker } from "@/components/MapView";
 
 // MapLibre touches `window`; skip SSR for the map itself.
 const MapView = dynamic(() => import("@/components/MapView"), {
@@ -16,32 +15,22 @@ const MapView = dynamic(() => import("@/components/MapView"), {
   ),
 });
 
-interface CookApi extends Omit<CookMarker, "lat" | "lng"> {
-  location: { lat: number; lng: number; label: string };
-}
-
 /**
  * Full-screen map. Populated on load: kitchen markers are dropped from the
  * seeded coordinates as soon as the cooks query resolves — no address entry
  * or user action required.
  */
 export default function MapPage() {
-  const { data } = useFetch<{ cooks: CookApi[] }>("/api/cooks");
+  const { cooks } = useCooks();
   const { position, isReal, status } = useGeoLocation();
-
-  const markers: CookMarker[] =
-    data?.cooks.map((c) => ({
-      id: c.id,
-      kitchenName: c.kitchenName,
-      lat: c.location.lat,
-      lng: c.location.lng,
-      ratingAvg: c.ratingAvg,
-      ratingCount: c.ratingCount,
-      activeMeals: c.activeMeals,
-    })) ?? [];
+  const markers = toCookMarkers(cooks);
 
   return (
-    <main className="flex h-[calc(100dvh-3.5rem)] flex-col">
+    // Tailwind calc values need `_` separators around operators — without
+    // them the utility is silently dropped and this main collapses to 0
+    // height, clipping the (fully populated) map out of view. Mobile also
+    // subtracts the 4rem bottom tab bar so the map fits exactly.
+    <main className="flex h-[calc(100dvh_-_3.5rem_-_4rem)] flex-col md:h-[calc(100dvh_-_3.5rem)]">
       <header className="border-b border-zinc-200 bg-white px-4 py-3 sm:px-6">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div>

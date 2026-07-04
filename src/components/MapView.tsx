@@ -139,5 +139,14 @@ export default function MapView({
     };
   }, [userPosition]);
 
-  return <div ref={containerRef} className={className} />;
+  // MapLibre stamps `.maplibregl-map { position: relative }` onto the element
+  // it is given, silently overriding caller positioning classes (its stylesheet
+  // loads with this lazy chunk, after Tailwind's utilities). Keeping MapLibre
+  // on an inner div that fills a caller-styled wrapper makes any `className`
+  // — absolute, h-full, whatever — behave as written.
+  return (
+    <div className={className}>
+      <div ref={containerRef} className="h-full w-full" />
+    </div>
+  );
 }
