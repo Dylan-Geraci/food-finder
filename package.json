@@ -1,0 +1,30 @@
+{
+  "name": "fable-file",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Hyper-local home-cooked meal marketplace MVP",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "seed": "node db/seed.mjs",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "lucide-react": "^1.23.0",
+    "maplibre-gl": "^5.6.0",
+    "mongodb-memory-server": "^10.1.4",
+    "mongoose": "^8.16.0",
+    "next": "^15.3.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.10",
+    "@types/node": "^22.15.0",
+    "@types/react": "^19.1.0",
+    "@types/react-dom": "^19.1.0",
+    "tailwindcss": "^4.1.10",
+    "typescript": "^5.8.3"
+  }
+}

@@ -1,0 +1,48 @@
+@import "tailwindcss";
+
+@theme {
+  /* Single saturated accent — deep orange-red. No pastels. */
+  --color-accent-50: #fdf2ea;
+  --color-accent-100: #fbe3d1;
+  --color-accent-500: #ef5a0e;
+  --color-accent-600: #dd4c06;
+  --color-accent-700: #b53f06;
+  --color-accent-800: #8f3407;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, sans-serif;
+}
+
+html,
+body {
+  height: 100%;
+  background: #ffffff;
+  color: #18181b;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+::selection {
+  background: #fbe3d1;
+}
+
+/* Hide scrollbars on horizontal chip/card rails without disabling scroll */
+.rail {
+  scrollbar-width: none;
+}
+.rail::-webkit-scrollbar {
+  display: none;
+}
+
+/* MapLibre popup restyling — crisp corners, hairline border */
+.maplibregl-popup-content {
+  border-radius: 6px !important;
+  padding: 0 !important;
+  overflow: hidden;
+  border: 1px solid #e4e4e7;
+  box-shadow: 0 12px 32px rgba(24, 24, 27, 0.14) !important;
+}
+.maplibregl-popup-tip {
+  border-top-color: #ffffff !important;
+}
