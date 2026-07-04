@@ -9,6 +9,9 @@ export interface CookCardData {
   kitchenName: string;
   bio: string;
   cookName: string;
+  portrait: string;
+  banner: string;
+  icon: string;
   cuisines: string[];
   ratingAvg: number;
   ratingCount: number;
@@ -31,7 +34,17 @@ export function CookCard({
       onClick={() => onQuickView(cook.id)}
       className="flex w-72 shrink-0 items-center gap-3 rounded-md border border-zinc-200 bg-white p-3.5 text-left shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-accent-600"
     >
-      <Avatar name={cook.kitchenName} size="lg" />
+      {cook.icon ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img
+          src={cook.icon}
+          alt={`${cook.kitchenName} icon`}
+          loading="lazy"
+          className="h-14 w-14 shrink-0 rounded-md border border-zinc-100 object-cover"
+        />
+      ) : (
+        <Avatar name={cook.kitchenName} size="lg" />
+      )}
       <span className="min-w-0 flex-1">
         <span className="block truncate font-semibold text-zinc-900">
           {cook.kitchenName}

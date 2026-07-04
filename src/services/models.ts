@@ -53,7 +53,9 @@ const CookProfileSchema = new Schema(
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, unique: true },
     kitchenName: { type: String, required: true },
     bio: { type: String, default: "" },
-    portrait: { type: String, default: "" },
+    portrait: { type: String, default: "" }, // the cook's headshot
+    banner: { type: String, default: "" }, // wide hero image for the kitchen page
+    icon: { type: String, default: "" }, // square kitchen mark, distinct from the banner
     location: {
       lat: { type: Number, required: true },
       lng: { type: Number, required: true },
@@ -78,7 +80,15 @@ const MealSchema = new Schema(
     description: { type: String, default: "" },
     price: { type: Number, required: true, min: 0 },
     prepMinutes: { type: Number, default: 30, min: 0 },
-    image: { type: String, default: "" },
+    image: { type: String, default: "" }, // primary photo (kept = photos[0] for card consumers)
+    photos: {
+      type: [String],
+      default: [],
+      validate: {
+        validator: (v: string[]) => v.length <= 2,
+        message: "A dish can have at most two photos",
+      },
+    },
     tags: { type: [String], default: [] },
     servingsLeft: { type: Number, default: 0, min: 0 },
     available: { type: Boolean, default: true },

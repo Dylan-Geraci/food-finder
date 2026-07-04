@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { connectDb } from "@/services/db";
+import { DEFAULT_MEAL_IMAGE, isMediaString } from "@/services/media";
 import { Meal, Review } from "@/services/models";
 import { recomputeCookRating } from "@/services/seed";
 
 export const dynamic = "force-dynamic";
 
 /** PATCH /api/meals/:id — kitchen listing management.
- *  Body (all optional): { available, price, servingsLeft, title, description, prepMinutes } */
+ *  Body (all optional): { available, price, servingsLeft, title, description, prepMinutes, photos } */
 export async function PATCH(
   req: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -27,6 +28,11 @@ export async function PATCH(
       update.title = body.title.trim().slice(0, 120);
     if (typeof body.description === "string")
       update.description = body.description.trim().slice(0, 600);
+    if (Array.isArray(body.photos)) {
+      const photos = body.photos.filter(isMediaString).filter(Boolean).slice(0, 2);
+      update.photos = photos;
+      update.image = photos[0] ?? DEFAULT_MEAL_IMAGE; // keep card consumers in sync
+    }
 
     if (Object.keys(update).length === 0) {
       return NextResponse.json({ error: "Nothing to update" }, { status: 400 });

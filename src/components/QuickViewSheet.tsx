@@ -14,6 +14,8 @@ interface QuickViewData {
     kitchenName: string;
     bio: string;
     portrait: string;
+    banner: string;
+    icon: string;
     location: { lat: number; lng: number; label: string };
     certifications: { name: string; status: "verified" | "pending"; expiresOn: string }[];
     cuisines: string[];
@@ -100,13 +102,21 @@ export function QuickViewSheet({
             </div>
           ) : (
             <>
+              {cook.banner && (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={cook.banner}
+                  alt={`${cook.kitchenName} banner`}
+                  className="mb-4 h-28 w-full rounded-md border border-zinc-200 object-cover"
+                />
+              )}
               <div className="flex items-start gap-3.5">
-                {cook.portrait ? (
+                {cook.icon || cook.portrait ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img
-                    src={cook.portrait}
-                    alt={cook.cookName}
-                    className="h-16 w-16 shrink-0 rounded-md object-cover"
+                    src={cook.icon || cook.portrait}
+                    alt={cook.icon ? `${cook.kitchenName} icon` : cook.cookName}
+                    className="h-16 w-16 shrink-0 rounded-md border border-zinc-100 object-cover"
                   />
                 ) : (
                   <Avatar name={cook.kitchenName} size="xl" tone="accent" />

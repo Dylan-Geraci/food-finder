@@ -16,6 +16,8 @@ interface CookDetail {
     kitchenName: string;
     bio: string;
     portrait: string;
+    banner: string;
+    icon: string;
     location: { lat: number; lng: number; label: string };
     certifications: { name: string; status: "verified" | "pending"; expiresOn: string }[];
     operatingHours: { day: string; open: string; close: string; closed: boolean }[];
@@ -31,6 +33,7 @@ interface CookDetail {
     price: number;
     prepMinutes: number;
     image: string;
+    photos: string[];
     tags: string[];
     servingsLeft: number;
     available: boolean;
@@ -80,15 +83,27 @@ export default function CookProfilePage({
         Browse
       </Link>
 
+      {/* Banner — wide kitchen hero, when the kitchen has uploaded one */}
+      {cook.banner && (
+        <div className="mt-4 overflow-hidden rounded-md border border-zinc-200">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={cook.banner}
+            alt={`${cook.kitchenName} banner`}
+            className="h-40 w-full object-cover sm:h-56"
+          />
+        </div>
+      )}
+
       {/* Header */}
-      <header className="mt-4 rounded-md border border-zinc-200 bg-white p-5 shadow-sm">
+      <header className={`${cook.banner ? "mt-3" : "mt-4"} rounded-md border border-zinc-200 bg-white p-5 shadow-sm`}>
         <div className="flex items-start gap-4">
-          {cook.portrait ? (
+          {cook.icon || cook.portrait ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img
-              src={cook.portrait}
-              alt={cook.cookName}
-              className="h-16 w-16 shrink-0 rounded-md object-cover"
+              src={cook.icon || cook.portrait}
+              alt={cook.icon ? `${cook.kitchenName} icon` : cook.cookName}
+              className="h-16 w-16 shrink-0 rounded-md border border-zinc-100 object-cover"
             />
           ) : (
             <Avatar name={cook.kitchenName} size="xl" tone="accent" />
@@ -168,14 +183,29 @@ export default function CookProfilePage({
               m.available ? "" : "opacity-60"
             }`}
           >
-            <div className="relative aspect-[16/9] bg-zinc-100">
+            <div className="group relative aspect-[16/9] bg-zinc-100">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={m.image}
+                src={m.photos[0] ?? m.image}
                 alt={m.title}
                 loading="lazy"
                 className="h-full w-full object-cover"
               />
+              {/* Second dish photo crossfades in on hover */}
+              {m.photos[1] && (
+                <>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={m.photos[1]}
+                    alt={`${m.title} — second photo`}
+                    loading="lazy"
+                    className="absolute inset-0 h-full w-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+                  />
+                  <span className="absolute bottom-2 right-2 rounded-sm bg-zinc-900/80 px-1.5 py-0.5 text-[10px] font-semibold tracking-wide text-white">
+                    2 PHOTOS
+                  </span>
+                </>
+              )}
               <span className="absolute right-2 top-2 rounded-sm border border-zinc-200 bg-white px-2 py-0.5 text-sm font-semibold text-zinc-900 shadow-sm">
                 ${m.price.toFixed(2)}
               </span>

@@ -26,6 +26,8 @@ export async function GET() {
       kitchenName: c.kitchenName,
       bio: c.bio,
       portrait: c.portrait ?? "",
+      banner: c.banner ?? "",
+      icon: c.icon ?? "",
       location: c.location,
       certifications: c.certifications,
       cuisines: c.cuisines,

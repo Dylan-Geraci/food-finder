@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
   BadgeCheck,
@@ -14,6 +15,7 @@ import {
   MapPin,
   Minus,
   PackageCheck,
+  Pencil,
   Plus,
   ShieldCheck,
   Star,
@@ -23,6 +25,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useFetch } from "@/hooks/useFetch";
 import { Avatar } from "@/components/Avatar";
+import { MediaUpload } from "@/components/MediaUpload";
 import { RatingStars } from "@/components/RatingStars";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
 import { ratingDistribution, roundRating } from "@/services/rating";
@@ -33,6 +36,8 @@ interface KitchenDetail {
     kitchenName: string;
     bio: string;
     portrait: string;
+    banner: string;
+    icon: string;
     location: { label: string };
     certifications: { name: string; status: "verified" | "pending"; expiresOn: string }[];
     operatingHours: { day: string; open: string; close: string; closed: boolean }[];
@@ -47,6 +52,7 @@ interface KitchenDetail {
     price: number;
     prepMinutes: number;
     image: string;
+    photos: string[];
     servingsLeft: number;
     available: boolean;
     ratingAvg: number;
@@ -88,6 +94,7 @@ export default function BusinessDashboardPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [showAddMeal, setShowAddMeal] = useState(false);
   const [newMeal, setNewMeal] = useState({ title: "", price: "", prepMinutes: "30", servings: "5", description: "" });
+  const [newMealPhotos, setNewMealPhotos] = useState<[string, string]>(["", ""]);
   const [formError, setFormError] = useState<string | null>(null);
 
   // Guards: guests to the auth prompt, diner accounts to their own portal
@@ -170,6 +177,7 @@ export default function BusinessDashboardPage() {
         prepMinutes: Number(newMeal.prepMinutes),
         servingsLeft: Number(newMeal.servings),
         description: newMeal.description,
+        photos: newMealPhotos.filter(Boolean),
       }),
     });
     const json = await res.json();
@@ -178,6 +186,7 @@ export default function BusinessDashboardPage() {
       return;
     }
     setNewMeal({ title: "", price: "", prepMinutes: "30", servings: "5", description: "" });
+    setNewMealPhotos(["", ""]);
     setShowAddMeal(false);
     refetchKitchen();
   }
@@ -197,12 +206,12 @@ export default function BusinessDashboardPage() {
     <main className="mx-auto max-w-5xl px-4 py-8 sm:px-6">
       {/* Header */}
       <div className="flex items-center gap-4 rounded-md border border-zinc-200 bg-white p-5 shadow-sm">
-        {cook?.portrait ? (
+        {cook?.icon || cook?.portrait ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
-            src={cook.portrait}
-            alt={cook.cookName}
-            className="h-16 w-16 shrink-0 rounded-md object-cover"
+            src={cook.icon || cook.portrait}
+            alt={cook.icon ? `${cook.kitchenName} icon` : cook.cookName}
+            className="h-16 w-16 shrink-0 rounded-md border border-zinc-100 object-cover"
           />
         ) : (
           <Avatar name={user.kitchenName ?? user.name} size="xl" tone="accent" />
@@ -231,13 +240,22 @@ export default function BusinessDashboardPage() {
             </div>
           )}
         </div>
-        <button
-          onClick={logout}
-          className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:text-zinc-900"
-        >
-          <LogOut size={14} />
-          Log out
-        </button>
+        <div className="flex shrink-0 items-center gap-2">
+          <Link
+            href="/profile/settings"
+            className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:text-zinc-900"
+          >
+            <Pencil size={14} />
+            <span className="hidden sm:inline">Edit kitchen</span>
+          </Link>
+          <button
+            onClick={logout}
+            className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:text-zinc-900"
+          >
+            <LogOut size={14} />
+            <span className="hidden sm:inline">Log out</span>
+          </button>
+        </div>
       </div>
 
       {/* KPIs */}
@@ -414,6 +432,23 @@ export default function BusinessDashboardPage() {
                   rows={2}
                   className={inputClass}
                 />
+                {/* Up to two dish photos; the first is the cover */}
+                <div className="grid grid-cols-2 gap-3">
+                  <MediaUpload
+                    label="Cover photo"
+                    value={newMealPhotos[0]}
+                    onChange={(v) => setNewMealPhotos(([, p2]) => [v, p2])}
+                    maxDim={1200}
+                    aspectClass="aspect-[4/3]"
+                  />
+                  <MediaUpload
+                    label="Second photo (optional)"
+                    value={newMealPhotos[1]}
+                    onChange={(v) => setNewMealPhotos(([p1]) => [p1, v])}
+                    maxDim={1200}
+                    aspectClass="aspect-[4/3]"
+                  />
+                </div>
                 {formError && (
                   <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
                     {formError}

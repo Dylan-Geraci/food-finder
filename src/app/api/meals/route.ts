@@ -1,10 +1,7 @@
 import { NextResponse } from "next/server";
 import { connectDb } from "@/services/db";
+import { DEFAULT_MEAL_IMAGE, isMediaString } from "@/services/media";
 import { CookProfile, Meal } from "@/services/models";
-
-// Verified generic food image used when a new listing has no photo yet
-const DEFAULT_MEAL_IMAGE =
-  "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=60";
 
 export const dynamic = "force-dynamic";
 
@@ -28,6 +25,7 @@ export async function GET() {
         price: m.price,
         prepMinutes: m.prepMinutes,
         image: m.image,
+        photos: m.photos ?? [],
         tags: m.tags,
         servingsLeft: m.servingsLeft,
         available: m.available,
@@ -66,6 +64,11 @@ export async function POST(req: Request) {
     const cook = await CookProfile.findById(cookId).select("_id").lean();
     if (!cook) return NextResponse.json({ error: "Kitchen not found" }, { status: 404 });
 
+    // Up to two photos per dish; the first doubles as the card image
+    const photos = Array.isArray(body.photos)
+      ? body.photos.filter(isMediaString).filter(Boolean).slice(0, 2)
+      : [];
+
     const meal = await Meal.create({
       key: `${title.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "") || "meal"}-${Date.now().toString(36)}`,
       cookId: cook._id,
@@ -76,7 +79,8 @@ export async function POST(req: Request) {
         Number.isFinite(Number(body.prepMinutes)) && Number(body.prepMinutes) >= 0
           ? Math.floor(Number(body.prepMinutes))
           : 30,
-      image: DEFAULT_MEAL_IMAGE,
+      image: photos[0] ?? DEFAULT_MEAL_IMAGE,
+      photos,
       tags: Array.isArray(body.tags) ? body.tags.slice(0, 6).map(String) : [],
       servingsLeft:
         Number.isFinite(Number(body.servingsLeft)) && Number(body.servingsLeft) >= 0
