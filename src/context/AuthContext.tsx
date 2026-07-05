@@ -38,6 +38,8 @@ export interface SessionUser {
   favoriteCookIds: string[];
   cookProfileId: string | null;
   kitchenName: string | null;
+  kitchenIcon: string | null;
+  hasPassword: boolean;
   joinedAt: string | null;
 }
 
@@ -47,17 +49,25 @@ export type AuthModalMode = "login" | "signup" | null;
 export interface SignupInput {
   name: string;
   email: string;
+  password: string;
   role: "diner" | "cook";
   kitchenName?: string;
   locationLabel?: string;
 }
 
+export interface LoginResult {
+  error: string | null;
+  /** True when the account is password-protected and needs one. */
+  needsPassword?: boolean;
+}
+
 interface AuthContextValue {
   status: AuthStatus;
   user: SessionUser | null;
-  /** Returns an error message, or null on success. */
-  login: (email: string) => Promise<string | null>;
+  login: (email: string, password?: string) => Promise<LoginResult>;
   signup: (input: SignupInput) => Promise<string | null>;
+  /** Re-pull the session payload after profile changes (no password needed). */
+  refreshSession: () => Promise<void>;
   logout: () => void;
   toggleFavorite: (cookId: string) => Promise<void>;
   authModal: AuthModalMode;
@@ -68,8 +78,9 @@ interface AuthContextValue {
 const AuthContext = createContext<AuthContextValue>({
   status: "loading",
   user: null,
-  login: async () => "Auth not ready",
+  login: async () => ({ error: "Auth not ready" }),
   signup: async () => "Auth not ready",
+  refreshSession: async () => {},
   logout: () => {},
   toggleFavorite: async () => {},
   authModal: null,
@@ -91,19 +102,44 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const login = useCallback(
-    async (email: string): Promise<string | null> => {
+    async (email: string, password?: string): Promise<LoginResult> => {
       try {
         const res = await fetch("/api/auth/login", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email }),
+          body: JSON.stringify({ email, password }),
         });
         const json = await res.json();
-        if (!res.ok) return json.error ?? "Login failed";
+        if (!res.ok) {
+          return {
+            error: json.error ?? "Login failed",
+            needsPassword: json.needsPassword === true,
+          };
+        }
         applySession(json.user);
-        return null;
+        return { error: null };
       } catch {
-        return "Network error — is the server running?";
+        return { error: "Network error — is the server running?" };
+      }
+    },
+    [applySession]
+  );
+
+  // Re-validate/refresh a session by email only (mock persistence)
+  const restoreSession = useCallback(
+    async (email: string): Promise<boolean> => {
+      try {
+        const res = await fetch("/api/auth/login", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email, restore: true }),
+        });
+        const json = await res.json();
+        if (!res.ok) return false;
+        applySession(json.user);
+        return true;
+      } catch {
+        return false;
       }
     },
     [applySession]
@@ -127,6 +163,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     },
     [applySession]
   );
+
+  const refreshSession = useCallback(async () => {
+    if (user) await restoreSession(user.email);
+  }, [user, restoreSession]);
 
   const logout = useCallback(() => {
     setUser(null);
@@ -175,13 +215,13 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setStatus("guest");
       return;
     }
-    login(savedEmail).then((error) => {
-      if (error) {
+    restoreSession(savedEmail).then((ok) => {
+      if (!ok) {
         localStorage.removeItem(STORAGE_KEY);
         setStatus("guest");
       }
     });
-  }, [login]);
+  }, [restoreSession]);
 
   return (
     <AuthContext.Provider
@@ -190,6 +230,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         login,
         signup,
+        refreshSession,
         logout,
         toggleFavorite,
         authModal,

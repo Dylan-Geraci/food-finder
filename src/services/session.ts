@@ -14,6 +14,8 @@ export interface SessionPayload {
   favoriteCookIds: string[];
   cookProfileId: string | null;
   kitchenName: string | null;
+  kitchenIcon: string | null;
+  hasPassword: boolean;
   joinedAt: string | null;
 }
 
@@ -21,12 +23,14 @@ export interface SessionPayload {
 export async function buildSessionPayload(user: any): Promise<SessionPayload> {
   let cookProfileId: string | null = null;
   let kitchenName: string | null = null;
+  let kitchenIcon: string | null = null;
   if (user.role === "cook") {
     const profile = await CookProfile.findOne({ userId: user._id })
-      .select("_id kitchenName")
+      .select("_id kitchenName icon")
       .lean();
     cookProfileId = profile ? String(profile._id) : null;
     kitchenName = profile?.kitchenName ?? null;
+    kitchenIcon = profile?.icon || null;
   }
   return {
     id: String(user._id),
@@ -45,6 +49,8 @@ export async function buildSessionPayload(user: any): Promise<SessionPayload> {
     favoriteCookIds: (user.favoriteCookIds ?? []).map(String),
     cookProfileId,
     kitchenName,
+    kitchenIcon,
+    hasPassword: Boolean(user.passwordHash),
     joinedAt: user.joinedAt ? new Date(user.joinedAt).toISOString() : null,
   };
 }

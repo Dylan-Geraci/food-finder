@@ -65,6 +65,7 @@ export function UserMenu() {
 
   const isCook = user.role === "cook";
   const displayName = isCook ? (user.kitchenName ?? user.name) : user.name;
+  const kitchenIcon = isCook ? user.kitchenIcon : null;
 
   function onMenuKeyDown(e: React.KeyboardEvent) {
     const nodes = panelRef.current?.querySelectorAll<HTMLElement>("[role=menuitem]");
@@ -125,7 +126,16 @@ export function UserMenu() {
           open ? "bg-zinc-100" : ""
         }`}
       >
-        <Avatar name={displayName} size="sm" tone="accent" />
+        {kitchenIcon ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={kitchenIcon}
+            alt=""
+            className="h-8 w-8 shrink-0 rounded-md border border-zinc-100 object-cover"
+          />
+        ) : (
+          <Avatar name={displayName} size="sm" tone="accent" />
+        )}
         <span className="hidden max-w-40 truncate text-sm font-medium text-zinc-800 lg:inline">
           {displayName}
         </span>
@@ -147,7 +157,16 @@ export function UserMenu() {
         >
           {/* Identity header */}
           <div className="flex items-center gap-3 border-b border-zinc-100 px-4 py-3.5">
-            <Avatar name={displayName} size="md" tone="accent" />
+            {kitchenIcon ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={kitchenIcon}
+                alt=""
+                className="h-10 w-10 shrink-0 rounded-md border border-zinc-100 object-cover"
+              />
+            ) : (
+              <Avatar name={displayName} size="md" tone="accent" />
+            )}
             <div className="min-w-0 flex-1">
               <p className="truncate text-sm font-semibold text-zinc-900">{displayName}</p>
               <p className="truncate text-xs text-zinc-400">{user.email}</p>

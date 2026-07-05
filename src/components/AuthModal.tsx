@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { signIn as oauthSignIn } from "next-auth/react";
-import { Apple, ChefHat, Globe, UtensilsCrossed, X, LogIn, UserPlus } from "lucide-react";
+import { Apple, Check, ChefHat, Globe, UtensilsCrossed, X, LogIn, UserPlus } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useFetch } from "@/hooks/useFetch";
+import { PASSWORD_RULES, passwordProblems, passwordScore } from "@/services/password-rules";
 import { Avatar } from "./Avatar";
 
 interface DirectoryUser {
@@ -29,6 +30,9 @@ export function AuthModal() {
   const [mode, setMode] = useState<"login" | "signup">("login");
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [needsPassword, setNeedsPassword] = useState(false);
   const [accountType, setAccountType] = useState<"diner" | "cook">("diner");
   const [kitchenName, setKitchenName] = useState("");
   const [locationLabel, setLocationLabel] = useState("");
@@ -48,6 +52,9 @@ export function AuthModal() {
     if (authModal) {
       setMode(authModal);
       setError(null);
+      setPassword("");
+      setConfirm("");
+      setNeedsPassword(false);
     }
   }, [authModal]);
 
@@ -64,40 +71,75 @@ export function AuthModal() {
 
   if (!open) return null;
 
+  function resetAndClose() {
+    setEmail("");
+    setName("");
+    setPassword("");
+    setConfirm("");
+    setKitchenName("");
+    setLocationLabel("");
+    setNeedsPassword(false);
+    closeAuth();
+  }
+
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    setBusy(true);
     setError(null);
-    const err =
-      mode === "login"
-        ? await login(email)
-        : await signup({
-            name,
-            email,
-            role: accountType,
-            kitchenName: accountType === "cook" ? kitchenName : undefined,
-            locationLabel: accountType === "cook" ? locationLabel : undefined,
-          });
-    setBusy(false);
-    if (err) {
-      setError(err);
+
+    if (mode === "signup") {
+      const problems = passwordProblems(password);
+      if (problems.length > 0) {
+        setError(`Password still needs: ${problems.join(", ").toLowerCase()}.`);
+        return;
+      }
+      if (password !== confirm) {
+        setError("Passwords don't match.");
+        return;
+      }
+    }
+
+    setBusy(true);
+    if (mode === "login") {
+      const result = await login(email, password || undefined);
+      setBusy(false);
+      if (result.error) {
+        setError(result.error);
+        if (result.needsPassword) setNeedsPassword(true);
+      } else {
+        resetAndClose();
+      }
     } else {
-      setEmail("");
-      setName("");
-      setKitchenName("");
-      setLocationLabel("");
-      closeAuth();
+      const err = await signup({
+        name,
+        email,
+        password,
+        role: accountType,
+        kitchenName: accountType === "cook" ? kitchenName : undefined,
+        locationLabel: accountType === "cook" ? locationLabel : undefined,
+      });
+      setBusy(false);
+      if (err) setError(err);
+      else resetAndClose();
     }
   }
 
   async function quickLogin(demoEmail: string) {
     setBusy(true);
     setError(null);
-    const err = await login(demoEmail);
+    const result = await login(demoEmail);
     setBusy(false);
-    if (err) setError(err);
-    else closeAuth();
+    if (result.error) {
+      setError(result.error);
+      if (result.needsPassword) {
+        setNeedsPassword(true);
+        setEmail(demoEmail);
+      }
+    } else {
+      resetAndClose();
+    }
   }
+
+  const score = passwordScore(password);
 
   return (
     <div className="fixed inset-0 z-[60] flex items-end justify-center sm:items-center" role="dialog" aria-modal="true">
@@ -197,6 +239,84 @@ export function AuthModal() {
               className={inputClass}
             />
 
+            {/* Login: the password field appears when the account needs one */}
+            {mode === "login" && needsPassword && (
+              <div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Password"
+                  autoFocus
+                  required
+                  className={inputClass}
+                />
+                <p className="mt-1.5 text-xs text-zinc-400">
+                  This account is password-protected.
+                </p>
+              </div>
+            )}
+
+            {/* Signup: password with live requirements + confirmation */}
+            {mode === "signup" && (
+              <>
+                <div>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    required
+                    className={inputClass}
+                  />
+                  {/* Strength meter — one segment per met requirement */}
+                  <div className="mt-2 flex gap-1" aria-hidden>
+                    {PASSWORD_RULES.map((r, i) => (
+                      <span
+                        key={r.key}
+                        className={`h-1 flex-1 rounded-sm transition-colors ${
+                          i < score
+                            ? score === PASSWORD_RULES.length
+                              ? "bg-emerald-600"
+                              : "bg-amber-500"
+                            : "bg-zinc-200"
+                        }`}
+                      />
+                    ))}
+                  </div>
+                  <ul className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
+                    {PASSWORD_RULES.map((r) => {
+                      const met = r.test(password);
+                      return (
+                        <li
+                          key={r.key}
+                          className={`flex items-center gap-1.5 text-xs ${
+                            met ? "text-emerald-700" : "text-zinc-400"
+                          }`}
+                        >
+                          <Check size={12} className={met ? "" : "opacity-40"} />
+                          {r.label}
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+                <div>
+                  <input
+                    type="password"
+                    value={confirm}
+                    onChange={(e) => setConfirm(e.target.value)}
+                    placeholder="Confirm password"
+                    required
+                    className={inputClass}
+                  />
+                  {confirm.length > 0 && confirm !== password && (
+                    <p className="mt-1.5 text-xs text-red-600">Passwords don&apos;t match yet.</p>
+                  )}
+                </div>
+              </>
+            )}
+
             {mode === "signup" && accountType === "cook" && (
               <>
                 <input
@@ -236,7 +356,8 @@ export function AuthModal() {
             </button>
             {mode === "login" && (
               <p className="text-center text-xs text-zinc-400">
-                Mock auth: any seeded or signed-up email works — no password.
+                Seeded demo accounts log in by email alone; accounts you create
+                are password-protected.
               </p>
             )}
           </form>

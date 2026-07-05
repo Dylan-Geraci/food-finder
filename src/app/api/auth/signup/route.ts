@@ -1,6 +1,8 @@
 import { NextResponse } from "next/server";
 import { connectDb } from "@/services/db";
 import { CookProfile, User } from "@/services/models";
+import { hashPassword } from "@/services/password";
+import { passwordProblems } from "@/services/password-rules";
 import { buildSessionPayload } from "@/services/session";
 import mockData from "../../../../../db/mock-data.json";
 
@@ -22,10 +24,11 @@ function slugify(name: string): string {
 
 /**
  * POST /api/auth/signup — creates a real account in the database.
- * Body: { name, email, role: "diner" | "cook", kitchenName?, locationLabel? }
- * Kitchen accounts also get a CookProfile (default hours, location
- * jittered around the city center) so they appear on the map and in the
- * grid immediately.
+ * Body: { name, email, password, role: "diner" | "cook", kitchenName?,
+ * locationLabel? }. Passwords must meet the standard strength rules and
+ * are stored as salted scrypt hashes. Kitchen accounts also get a
+ * CookProfile (default hours, location jittered around the city center)
+ * so they appear on the map and in the grid immediately.
  */
 export async function POST(req: Request) {
   try {
@@ -33,6 +36,7 @@ export async function POST(req: Request) {
     const body = (await req.json()) ?? {};
     const name = (body.name ?? "").toString().trim();
     const email = (body.email ?? "").toString().trim().toLowerCase();
+    const password = (body.password ?? "").toString();
     const role = body.role === "cook" ? "cook" : body.role === "diner" ? "diner" : null;
 
     if (!name || !email || !role) {
@@ -43,6 +47,13 @@ export async function POST(req: Request) {
     }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       return NextResponse.json({ error: "Enter a valid email address" }, { status: 400 });
+    }
+    const problems = passwordProblems(password);
+    if (problems.length > 0) {
+      return NextResponse.json(
+        { error: `Password needs: ${problems.join(", ").toLowerCase()}` },
+        { status: 400 }
+      );
     }
     if (await User.exists({ email })) {
       return NextResponse.json(
@@ -55,6 +66,7 @@ export async function POST(req: Request) {
       key: `${slugify(name) || "user"}-${Date.now().toString(36)}`,
       name,
       email,
+      passwordHash: hashPassword(password),
       role,
       addresses: [],
       favoriteCookIds: [],

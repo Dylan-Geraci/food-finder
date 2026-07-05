@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useFetch } from "@/hooks/useFetch";
+import { PASSWORD_RULES, passwordProblems } from "@/services/password-rules";
 import { Avatar } from "@/components/Avatar";
 import { MediaUpload } from "@/components/MediaUpload";
 
@@ -87,7 +88,7 @@ interface KitchenIdentityData {
  * and menus. Photos are compressed client-side before saving.
  */
 function KitchenIdentitySection({ cookId }: { cookId: string }) {
-  const { user, login } = useAuth();
+  const { refreshSession } = useAuth();
   const { data, refetch } = useFetch<KitchenIdentityData>(`/api/cooks/${cookId}`);
 
   const [kitchenName, setKitchenName] = useState("");
@@ -123,7 +124,7 @@ function KitchenIdentitySection({ cookId }: { cookId: string }) {
       if (!res.ok) {
         setError(json.error ?? "Failed to save kitchen profile");
       } else {
-        if (user) await login(user.email); // refresh kitchen name in the session
+        await refreshSession(); // kitchen name/icon live in the session payload
         refetch();
         setSaved(true);
       }
@@ -563,9 +564,167 @@ function HoursSection({ cookId }: { cookId: string }) {
   );
 }
 
+/**
+ * Password management — add one to a passwordless demo account, or rotate
+ * an existing one (current password required). Shares the signup rules.
+ */
+function PasswordSection() {
+  const { user, refreshSession } = useAuth();
+  const [current, setCurrent] = useState("");
+  const [next, setNext] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  if (!user) return null;
+  const hasPassword = user.hasPassword;
+
+  async function submit(e: React.FormEvent) {
+    e.preventDefault();
+    if (!user) return;
+    setError(null);
+    setSaved(false);
+    const problems = passwordProblems(next);
+    if (problems.length > 0) {
+      setError(`Password still needs: ${problems.join(", ").toLowerCase()}.`);
+      return;
+    }
+    if (next !== confirm) {
+      setError("New passwords don't match.");
+      return;
+    }
+    setSaving(true);
+    try {
+      const res = await fetch("/api/users", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          key: user.key,
+          currentPassword: hasPassword ? current : undefined,
+          newPassword: next,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) {
+        setError(json.error ?? "Failed to update password");
+      } else {
+        await refreshSession();
+        setCurrent("");
+        setNext("");
+        setConfirm("");
+        setSaved(true);
+      }
+    } catch {
+      setError("Network error — is the server running?");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <section className="mt-6 rounded-md border border-zinc-200 bg-white p-5 shadow-sm">
+      <h2 className="mb-1 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-zinc-400">
+        <Lock size={14} />
+        Password
+      </h2>
+      <p className="mb-4 text-xs text-zinc-400">
+        {hasPassword
+          ? "Your account is password-protected. Enter your current password to set a new one."
+          : "This demo account has no password — anyone with the email can log in. Add one to protect it."}
+      </p>
+      <form onSubmit={submit} className="space-y-3.5">
+        {hasPassword && (
+          <div>
+            <label htmlFor="pw-current" className="mb-1.5 block text-sm font-medium text-zinc-700">
+              Current password
+            </label>
+            <input
+              id="pw-current"
+              type="password"
+              value={current}
+              onChange={(e) => setCurrent(e.target.value)}
+              required
+              className={inputClass}
+            />
+          </div>
+        )}
+        <div>
+          <label htmlFor="pw-new" className="mb-1.5 block text-sm font-medium text-zinc-700">
+            New password
+          </label>
+          <input
+            id="pw-new"
+            type="password"
+            value={next}
+            onChange={(e) => {
+              setNext(e.target.value);
+              setSaved(false);
+            }}
+            required
+            className={inputClass}
+          />
+          <ul className="mt-2 grid grid-cols-2 gap-x-3 gap-y-1">
+            {PASSWORD_RULES.map((r) => {
+              const met = r.test(next);
+              return (
+                <li
+                  key={r.key}
+                  className={`flex items-center gap-1.5 text-xs ${
+                    met ? "text-emerald-700" : "text-zinc-400"
+                  }`}
+                >
+                  <Check size={12} className={met ? "" : "opacity-40"} />
+                  {r.label}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div>
+          <label htmlFor="pw-confirm" className="mb-1.5 block text-sm font-medium text-zinc-700">
+            Confirm new password
+          </label>
+          <input
+            id="pw-confirm"
+            type="password"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            required
+            className={inputClass}
+          />
+          {confirm.length > 0 && confirm !== next && (
+            <p className="mt-1.5 text-xs text-red-600">Passwords don&apos;t match yet.</p>
+          )}
+        </div>
+        {error && (
+          <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
+            {error}
+          </p>
+        )}
+        <div className="flex items-center gap-3">
+          <button
+            type="submit"
+            disabled={saving}
+            className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700 disabled:opacity-40"
+          >
+            {saving ? "Saving..." : hasPassword ? "Update password" : "Add password"}
+          </button>
+          {saved && (
+            <span className="inline-flex items-center gap-1.5 text-sm font-medium text-emerald-700">
+              <Check size={15} />
+              {hasPassword ? "Password updated" : "Password added"}
+            </span>
+          )}
+        </div>
+      </form>
+    </section>
+  );
+}
+
 /** Account settings — profile identity, kitchen media, per-device preferences. */
 export default function SettingsPage() {
-  const { status, user, login } = useAuth();
+  const { status, user, refreshSession } = useAuth();
   const router = useRouter();
 
   const [name, setName] = useState("");
@@ -616,7 +775,7 @@ export default function SettingsPage() {
       if (!res.ok) {
         setError(json.error ?? "Failed to save changes");
       } else {
-        await login(user.email); // refresh the session payload in context
+        await refreshSession(); // pull the updated payload into context
         setSaved(true);
       }
     } catch {
@@ -697,6 +856,9 @@ export default function SettingsPage() {
           </div>
         </form>
       </section>
+
+      {/* Password (all accounts) */}
+      <PasswordSection />
 
       {/* Kitchen identity + hours (business accounts) */}
       {isCook && user.cookProfileId && <KitchenIdentitySection cookId={user.cookProfileId} />}

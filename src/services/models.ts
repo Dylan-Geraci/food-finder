@@ -21,6 +21,8 @@ const UserSchema = new Schema(
     key: { type: String, required: true, unique: true }, // stable slug (seed or signup)
     name: { type: String, required: true },
     email: { type: String, required: true, unique: true },
+    // "scrypt:<salt>:<hash>"; empty = passwordless demo account
+    passwordHash: { type: String, default: "" },
     role: { type: String, enum: ["diner", "cook"], required: true },
     addresses: { type: [AddressSchema], default: [] },
     favoriteCookIds: { type: [Schema.Types.ObjectId], ref: "CookProfile", default: [] },
