@@ -94,18 +94,18 @@ export default function LandingPage() {
         <div className="mx-auto grid max-w-7xl items-center gap-10 px-4 py-12 sm:px-6 md:grid-cols-2 md:py-16">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.18em] text-accent-600">
-              Hyper-local home cooking
+              Local home cooking
             </p>
             <h1 className="mt-3 text-4xl font-extrabold leading-[1.08] tracking-tight text-zinc-900 sm:text-5xl">
               Real meals, made
               <br />
-              in real kitchens
+              in real homes
               <br />
               near you.
             </h1>
             <p className="mt-4 max-w-md text-[15px] leading-relaxed text-zinc-500">
               Skip the marketplace clutter. FableFare is built for one thing:
-              connecting you with certified home cooks in your neighborhood.
+              connecting you with amazing home cooks in your neighborhood.
             </p>
 
             <form onSubmit={onSearch} className="mt-7 flex max-w-md gap-2">
@@ -164,8 +164,6 @@ export default function LandingPage() {
                 </dd>
               </div>
               <div className="flex items-center gap-2">
-                <ShieldCheck size={17} className="text-accent-600" />
-                <dd className="text-sm text-zinc-600">Food-handler certified</dd>
               </div>
             </dl>
           </div>
