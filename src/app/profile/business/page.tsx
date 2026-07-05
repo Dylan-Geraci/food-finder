@@ -26,6 +26,7 @@ import { Avatar } from "@/components/Avatar";
 import { MediaUpload } from "@/components/MediaUpload";
 import { RatingStars } from "@/components/RatingStars";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
+import { OrderDetailModal, type OrderDetail } from "@/components/OrderDetailModal";
 import { ratingDistribution, roundRating } from "@/services/rating";
 
 interface KitchenDetail {
@@ -60,11 +61,14 @@ interface KitchenDetail {
 interface OrderRow {
   id: string;
   qty: number;
+  priceEach: number;
   total: number;
   type: string;
+  note: string;
   status: string;
   placedAt: string;
   mealTitle: string;
+  mealImage: string;
   dinerName: string;
 }
 
@@ -89,6 +93,7 @@ export default function BusinessDashboardPage() {
   const { status, user } = useAuth();
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
   const [showAddMeal, setShowAddMeal] = useState(false);
   const [newMeal, setNewMeal] = useState({ title: "", price: "", prepMinutes: "30", servings: "5", description: "" });
   const [newMealPhotos, setNewMealPhotos] = useState<[string, string]>(["", ""]);
@@ -274,18 +279,29 @@ export default function BusinessDashboardPage() {
               <ul className="divide-y divide-zinc-200 rounded-md border border-zinc-200 bg-white shadow-sm">
                 {queue.map((o) => (
                   <li key={o.id} className="p-3.5">
-                    <div className="flex items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <p className="truncate text-sm font-semibold text-zinc-900">
+                    {/* Clicking the summary expands full order details */}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedOrder(o)}
+                      className="flex w-full items-center justify-between gap-3 rounded-md text-left transition-colors hover:bg-zinc-50 focus-visible:bg-zinc-50 focus-visible:outline-none"
+                    >
+                      <span className="min-w-0">
+                        <span className="block truncate text-sm font-semibold text-zinc-900">
                           {o.mealTitle} <span className="font-normal text-zinc-400">x{o.qty}</span>
-                        </p>
-                        <p className="text-xs text-zinc-500">
+                        </span>
+                        <span className="block text-xs text-zinc-500">
                           {o.dinerName} · {o.type} · {timeLabel(o.placedAt)} ·{" "}
                           <span className="font-semibold text-zinc-700">${o.total.toFixed(2)}</span>
-                        </p>
-                      </div>
+                        </span>
+                      </span>
                       <OrderStatusBadge status={o.status} />
-                    </div>
+                    </button>
+                    {o.note && (
+                      <p className="mt-2 flex items-start gap-1.5 rounded-md border border-zinc-100 bg-zinc-50 px-2.5 py-1.5 text-xs leading-relaxed text-zinc-600">
+                        <MessageSquareText size={13} className="mt-0.5 shrink-0 text-zinc-400" />
+                        {o.note}
+                      </p>
+                    )}
                     <div className="mt-2.5 flex gap-2">
                       {o.status === "pending" && (
                         <>
@@ -339,17 +355,23 @@ export default function BusinessDashboardPage() {
                 </summary>
                 <ul className="mt-2 divide-y divide-zinc-200 rounded-md border border-zinc-200 bg-white shadow-sm">
                   {history.map((o) => (
-                    <li key={o.id} className="flex items-center justify-between gap-3 p-3">
-                      <p className="min-w-0 truncate text-sm text-zinc-700">
-                        {o.mealTitle} x{o.qty}{" "}
-                        <span className="text-zinc-400">
-                          · {o.dinerName} · {timeLabel(o.placedAt)}
+                    <li key={o.id}>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedOrder(o)}
+                        className="flex w-full items-center justify-between gap-3 p-3 text-left transition-colors hover:bg-zinc-50 focus-visible:bg-zinc-50 focus-visible:outline-none"
+                      >
+                        <span className="min-w-0 truncate text-sm text-zinc-700">
+                          {o.mealTitle} x{o.qty}{" "}
+                          <span className="text-zinc-400">
+                            · {o.dinerName} · {timeLabel(o.placedAt)}
+                          </span>
                         </span>
-                      </p>
-                      <span className="text-sm font-medium tabular-nums text-zinc-700">
-                        ${o.total.toFixed(2)}
-                      </span>
-                      <OrderStatusBadge status={o.status} />
+                        <span className="text-sm font-medium tabular-nums text-zinc-700">
+                          ${o.total.toFixed(2)}
+                        </span>
+                        <OrderStatusBadge status={o.status} />
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -579,6 +601,12 @@ export default function BusinessDashboardPage() {
           </section>
         </div>
       </div>
+
+      <OrderDetailModal
+        order={selectedOrder}
+        perspective="kitchen"
+        onClose={() => setSelectedOrder(null)}
+      />
     </main>
   );
 }

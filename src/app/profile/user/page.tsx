@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
+  ChevronRight,
   Heart,
   Home,
   MapPin,
@@ -16,12 +17,15 @@ import { useFetch } from "@/hooks/useFetch";
 import { Avatar } from "@/components/Avatar";
 import { RatingStars } from "@/components/RatingStars";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
+import { OrderDetailModal, type OrderDetail } from "@/components/OrderDetailModal";
 
 interface OrderRow {
   id: string;
   qty: number;
+  priceEach: number;
   total: number;
   type: string;
+  note: string;
   status: string;
   placedAt: string;
   mealTitle: string;
@@ -59,6 +63,7 @@ function shortDate(iso: string): string {
 export default function DinerDashboardPage() {
   const { status, user, toggleFavorite } = useAuth();
   const router = useRouter();
+  const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
 
   // Guards: guests to the auth prompt, business accounts to their own portal
   useEffect(() => {
@@ -129,29 +134,34 @@ export default function DinerDashboardPage() {
       ) : (
         <ul className="divide-y divide-zinc-200 rounded-md border border-zinc-200 bg-white shadow-sm">
           {orders.map((o) => (
-            <li key={o.id} className="flex items-center gap-3.5 p-3.5">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={o.mealImage}
-                alt={o.mealTitle}
-                loading="lazy"
-                className="h-12 w-12 shrink-0 rounded-sm object-cover"
-              />
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-semibold text-zinc-900">
-                  {o.mealTitle} <span className="font-normal text-zinc-400">x{o.qty}</span>
-                </p>
-                <p className="truncate text-xs text-zinc-500">
-                  <Link href={`/cooks/${o.cookId}`} className="hover:text-accent-600">
-                    {o.kitchenName}
-                  </Link>{" "}
-                  · {o.type} · {shortDate(o.placedAt)}
-                </p>
-              </div>
-              <span className="text-sm font-semibold tabular-nums text-zinc-900">
-                ${o.total.toFixed(2)}
-              </span>
-              <OrderStatusBadge status={o.status} />
+            <li key={o.id}>
+              {/* Click any order to expand its full details */}
+              <button
+                type="button"
+                onClick={() => setSelectedOrder(o)}
+                className="flex w-full items-center gap-3.5 p-3.5 text-left transition-colors hover:bg-zinc-50 focus-visible:bg-zinc-50 focus-visible:outline-none"
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={o.mealImage}
+                  alt={o.mealTitle}
+                  loading="lazy"
+                  className="h-12 w-12 shrink-0 rounded-sm object-cover"
+                />
+                <span className="min-w-0 flex-1">
+                  <span className="block truncate text-sm font-semibold text-zinc-900">
+                    {o.mealTitle} <span className="font-normal text-zinc-400">x{o.qty}</span>
+                  </span>
+                  <span className="block truncate text-xs text-zinc-500">
+                    {o.kitchenName} · {o.type} · {shortDate(o.placedAt)}
+                  </span>
+                </span>
+                <span className="text-sm font-semibold tabular-nums text-zinc-900">
+                  ${o.total.toFixed(2)}
+                </span>
+                <OrderStatusBadge status={o.status} />
+                <ChevronRight size={15} className="shrink-0 text-zinc-300" />
+              </button>
             </li>
           ))}
         </ul>
@@ -271,6 +281,12 @@ export default function DinerDashboardPage() {
           ))}
         </ul>
       )}
+
+      <OrderDetailModal
+        order={selectedOrder}
+        perspective="diner"
+        onClose={() => setSelectedOrder(null)}
+      />
     </main>
   );
 }
