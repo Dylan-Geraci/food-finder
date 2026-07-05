@@ -39,6 +39,7 @@ interface KitchenDetail {
     icon: string;
     location: { label: string };
     operatingHours: { day: string; open: string; close: string; closed: boolean }[];
+    hoursExceptions: { date: string; closed: boolean; open: string; close: string; note: string }[];
     cuisines: string[];
     ratingAvg: number;
     ratingCount: number;
@@ -483,12 +484,20 @@ export default function BusinessDashboardPage() {
             </div>
           </section>
 
-          {/* Operating hours */}
+          {/* Hours summary — edited in settings */}
           <section className="rounded-md border border-zinc-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-zinc-400">
-              <CalendarClock size={14} />
-              Operating hours
-            </h2>
+            <div className="mb-3 flex items-center justify-between">
+              <h2 className="flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-zinc-400">
+                <CalendarClock size={14} />
+                General hours
+              </h2>
+              <Link
+                href="/profile/settings"
+                className="text-xs font-semibold text-accent-600 transition-colors hover:text-accent-700"
+              >
+                Manage
+              </Link>
+            </div>
             <ul className="space-y-1">
               {(cook?.operatingHours ?? []).map((h) => (
                 <li key={h.day} className="flex justify-between text-sm">
@@ -499,6 +508,34 @@ export default function BusinessDashboardPage() {
                 </li>
               ))}
             </ul>
+            {(() => {
+              const today = new Date().toISOString().slice(0, 10);
+              const upcoming = (cook?.hoursExceptions ?? []).filter((x) => x.date >= today);
+              if (upcoming.length === 0) return null;
+              return (
+                <div className="mt-3 border-t border-zinc-100 pt-3">
+                  <p className="mb-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                    Upcoming exceptions
+                  </p>
+                  <ul className="space-y-1">
+                    {upcoming.slice(0, 4).map((x) => (
+                      <li key={x.date} className="flex justify-between text-[13px]">
+                        <span className="font-medium text-zinc-600">
+                          {new Date(`${x.date}T12:00:00`).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "numeric",
+                          })}
+                          {x.note && <span className="font-normal text-zinc-400"> · {x.note}</span>}
+                        </span>
+                        <span className={x.closed ? "font-medium text-red-600" : "text-zinc-900"}>
+                          {x.closed ? "Closed" : `${x.open} – ${x.close}`}
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })()}
           </section>
         </div>
       </div>

@@ -21,6 +21,7 @@ interface CookDetail {
     icon: string;
     location: { lat: number; lng: number; label: string };
     operatingHours: { day: string; open: string; close: string; closed: boolean }[];
+    hoursExceptions: { date: string; closed: boolean; open: string; close: string; note: string }[];
     cuisines: string[];
     ratingAvg: number;
     ratingCount: number;
@@ -143,7 +144,7 @@ export default function CookProfilePage({
           <div className="mt-4 border-t border-zinc-100 pt-4">
             <p className="mb-2 flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-zinc-400">
               <CalendarClock size={13} />
-              Hours
+              General hours
             </p>
             <div className="grid grid-cols-2 gap-x-6 gap-y-1 sm:grid-cols-4">
               {cook.operatingHours.map((h) => (
@@ -155,6 +156,31 @@ export default function CookProfilePage({
                 </div>
               ))}
             </div>
+            {(() => {
+              const today = new Date().toISOString().slice(0, 10);
+              const upcoming = cook.hoursExceptions
+                .filter((x) => x.date >= today)
+                .slice(0, 4);
+              if (upcoming.length === 0) return null;
+              return (
+                <div className="mt-3 rounded-md border border-amber-200 bg-amber-50 px-3 py-2">
+                  {upcoming.map((x) => (
+                    <p key={x.date} className="text-[13px] text-amber-800">
+                      <span className="font-semibold">
+                        {new Date(`${x.date}T12:00:00`).toLocaleDateString("en-US", {
+                          weekday: "short",
+                          month: "short",
+                          day: "numeric",
+                        })}
+                      </span>
+                      {" — "}
+                      {x.closed ? "closed" : `open ${x.open}–${x.close}`}
+                      {x.note && ` (${x.note})`}
+                    </p>
+                  ))}
+                </div>
+              );
+            })()}
           </div>
         )}
       </header>

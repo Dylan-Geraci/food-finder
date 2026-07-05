@@ -39,6 +39,19 @@ const OperatingHoursSchema = new Schema(
   { _id: false }
 );
 
+// Date-specific override of the weekly schedule: a holiday closure or
+// custom hours for one calendar day.
+const HoursExceptionSchema = new Schema(
+  {
+    date: { type: String, required: true }, // "YYYY-MM-DD"
+    closed: { type: Boolean, default: true },
+    open: { type: String, default: "" }, // "HH:MM" when custom hours
+    close: { type: String, default: "" },
+    note: { type: String, default: "" }, // e.g. "Thanksgiving"
+  },
+  { _id: false }
+);
+
 const CookProfileSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, unique: true },
@@ -52,7 +65,8 @@ const CookProfileSchema = new Schema(
       lng: { type: Number, required: true },
       label: { type: String, default: "" },
     },
-    operatingHours: { type: [OperatingHoursSchema], default: [] },
+    operatingHours: { type: [OperatingHoursSchema], default: [] }, // "General Hours"
+    hoursExceptions: { type: [HoursExceptionSchema], default: [] },
     cuisines: { type: [String], default: [] },
     // Denormalized aggregates maintained by the rating engine so map
     // markers and cards render without an aggregation query.

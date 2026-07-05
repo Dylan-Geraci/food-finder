@@ -62,6 +62,7 @@ async function runSeed(): Promise<void> {
       icon: c.icon,
       location: c.location,
       operatingHours: c.operatingHours,
+      hoursExceptions: c.hoursExceptions,
       cuisines: c.cuisines,
       ratingAvg: 0.0,
       ratingCount: 0,

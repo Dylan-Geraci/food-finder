@@ -193,6 +193,22 @@
       "cuisines": [
         "Tex-Mex",
         "Mexican"
+      ],
+      "hoursExceptions": [
+        {
+          "date": "2026-07-20",
+          "closed": true,
+          "open": "",
+          "close": "",
+          "note": "Summer break"
+        },
+        {
+          "date": "2026-07-21",
+          "closed": true,
+          "open": "",
+          "close": "",
+          "note": "Summer break"
+        }
       ]
     },
     {
@@ -253,6 +269,15 @@
       ],
       "cuisines": [
         "Japanese"
+      ],
+      "hoursExceptions": [
+        {
+          "date": "2026-07-12",
+          "closed": false,
+          "open": "12:00",
+          "close": "16:00",
+          "note": "Farmers market pop-up"
+        }
       ]
     },
     {
@@ -315,7 +340,8 @@
         "West African",
         "Ghanaian",
         "Nigerian"
-      ]
+      ],
+      "hoursExceptions": []
     },
     {
       "userKey": "priya",
@@ -376,7 +402,8 @@
       "cuisines": [
         "Indian",
         "South Indian"
-      ]
+      ],
+      "hoursExceptions": []
     },
     {
       "userKey": "tom",
@@ -437,7 +464,8 @@
       "cuisines": [
         "BBQ",
         "Southern"
-      ]
+      ],
+      "hoursExceptions": []
     },
     {
       "userKey": "nadia",
@@ -498,7 +526,8 @@
       "cuisines": [
         "Levantine",
         "Middle Eastern"
-      ]
+      ],
+      "hoursExceptions": []
     }
   ],
   "meals": [
