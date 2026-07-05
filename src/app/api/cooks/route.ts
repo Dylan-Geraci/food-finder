@@ -29,7 +29,6 @@ export async function GET() {
       banner: c.banner ?? "",
       icon: c.icon ?? "",
       location: c.location,
-      certifications: c.certifications,
       cuisines: c.cuisines,
       ratingAvg: c.ratingAvg,
       ratingCount: c.ratingCount,

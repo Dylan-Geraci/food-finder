@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { ArrowRight, LogIn, MapPin, Search, ShieldCheck, Star, Store, UserPlus } from "lucide-react";
+import { ArrowRight, LogIn, MapPin, Search, Star, Store, UserPlus } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { MealCard, type MealCardData } from "@/components/MealCard";
 import { CookCard } from "@/components/CookCard";
@@ -162,8 +162,6 @@ export default function LandingPage() {
                   </span>{" "}
                   avg kitchen rating
                 </dd>
-              </div>
-              <div className="flex items-center gap-2">
               </div>
             </dl>
           </div>

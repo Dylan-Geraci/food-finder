@@ -4,20 +4,18 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  BadgeCheck,
   CalendarClock,
   Check,
   ChefHat,
   ClipboardList,
   Clock,
   ListPlus,
-  LogOut,
   MapPin,
+  MessageSquareText,
   Minus,
   PackageCheck,
   Pencil,
   Plus,
-  ShieldCheck,
   Star,
   Trash2,
   X,
@@ -39,7 +37,6 @@ interface KitchenDetail {
     banner: string;
     icon: string;
     location: { label: string };
-    certifications: { name: string; status: "verified" | "pending"; expiresOn: string }[];
     operatingHours: { day: string; open: string; close: string; closed: boolean }[];
     cuisines: string[];
     ratingAvg: number;
@@ -89,7 +86,7 @@ function timeLabel(iso: string): string {
 
 /** Kitchen dashboard — queue, listings (CRUD), hours, certs, rating analytics. */
 export default function BusinessDashboardPage() {
-  const { status, user, logout } = useAuth();
+  const { status, user } = useAuth();
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [showAddMeal, setShowAddMeal] = useState(false);
@@ -197,7 +194,7 @@ export default function BusinessDashboardPage() {
       value: cook && cook.ratingCount > 0 ? roundRating(cook.ratingAvg).toFixed(1) : "New",
       Icon: Star,
     },
-    { label: "Reviews", value: String(cook?.ratingCount ?? 0), Icon: ShieldCheck },
+    { label: "Reviews", value: String(cook?.ratingCount ?? 0), Icon: MessageSquareText },
     { label: "Active listings", value: String(meals.filter((m) => m.available).length), Icon: ClipboardList },
     { label: "Open orders", value: String(queue.length), Icon: PackageCheck },
   ];
@@ -240,22 +237,13 @@ export default function BusinessDashboardPage() {
             </div>
           )}
         </div>
-        <div className="flex shrink-0 items-center gap-2">
-          <Link
-            href="/profile/settings"
-            className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:text-zinc-900"
-          >
-            <Pencil size={14} />
-            <span className="hidden sm:inline">Edit kitchen</span>
-          </Link>
-          <button
-            onClick={logout}
-            className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:text-zinc-900"
-          >
-            <LogOut size={14} />
-            <span className="hidden sm:inline">Log out</span>
-          </button>
-        </div>
+        <Link
+          href="/profile/settings"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:text-zinc-900"
+        >
+          <Pencil size={14} />
+          <span className="hidden sm:inline">Edit kitchen</span>
+        </Link>
       </div>
 
       {/* KPIs */}
@@ -570,33 +558,6 @@ export default function BusinessDashboardPage() {
                 </div>
               ))}
             </div>
-          </section>
-
-          {/* Certifications */}
-          <section className="rounded-md border border-zinc-200 bg-white p-4 shadow-sm">
-            <h2 className="mb-3 flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-zinc-400">
-              <ShieldCheck size={14} />
-              Health certifications
-            </h2>
-            <ul className="space-y-2.5">
-              {(cook?.certifications ?? []).map((cert) => (
-                <li key={cert.name} className="flex items-start gap-2.5">
-                  {cert.status === "verified" ? (
-                    <BadgeCheck size={17} className="mt-0.5 shrink-0 text-emerald-600" />
-                  ) : (
-                    <Clock size={17} className="mt-0.5 shrink-0 text-amber-600" />
-                  )}
-                  <div>
-                    <p className="text-sm font-semibold text-zinc-900">{cert.name}</p>
-                    <p className="text-xs text-zinc-500">
-                      {cert.status === "verified"
-                        ? `Verified${cert.expiresOn ? ` · expires ${cert.expiresOn}` : ""}`
-                        : "Pending review"}
-                    </p>
-                  </div>
-                </li>
-              ))}
-            </ul>
           </section>
 
           {/* Operating hours */}

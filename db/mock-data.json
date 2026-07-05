@@ -146,18 +146,6 @@
         "lng": -117.8677,
         "label": "Downtown Santa Ana"
       },
-      "certifications": [
-        {
-          "name": "Food Handler Certificate",
-          "status": "verified",
-          "expiresOn": "2027-03-15"
-        },
-        {
-          "name": "Cottage Food Permit",
-          "status": "verified",
-          "expiresOn": "2026-11-01"
-        }
-      ],
       "operatingHours": [
         {
           "day": "Mon",
@@ -219,13 +207,6 @@
         "lng": -118.4912,
         "label": "Santa Monica"
       },
-      "certifications": [
-        {
-          "name": "Food Handler Certificate",
-          "status": "verified",
-          "expiresOn": "2026-09-30"
-        }
-      ],
       "operatingHours": [
         {
           "day": "Mon",
@@ -286,18 +267,6 @@
         "lng": -118.2352,
         "label": "Arts District, DTLA"
       },
-      "certifications": [
-        {
-          "name": "Food Handler Certificate",
-          "status": "verified",
-          "expiresOn": "2027-01-20"
-        },
-        {
-          "name": "Allergen Awareness Training",
-          "status": "verified",
-          "expiresOn": "2026-08-12"
-        }
-      ],
       "operatingHours": [
         {
           "day": "Mon",
@@ -360,13 +329,6 @@
         "lng": -117.8265,
         "label": "Woodbridge, Irvine"
       },
-      "certifications": [
-        {
-          "name": "Food Handler Certificate",
-          "status": "verified",
-          "expiresOn": "2026-12-05"
-        }
-      ],
       "operatingHours": [
         {
           "day": "Mon",
@@ -428,18 +390,6 @@
         "lng": -117.9988,
         "label": "Huntington Beach"
       },
-      "certifications": [
-        {
-          "name": "Food Handler Certificate",
-          "status": "verified",
-          "expiresOn": "2026-10-18"
-        },
-        {
-          "name": "Open Flame / Smoker Permit",
-          "status": "pending",
-          "expiresOn": ""
-        }
-      ],
       "operatingHours": [
         {
           "day": "Mon",
@@ -501,13 +451,6 @@
         "lng": -117.913,
         "label": "Little Arabia, Anaheim"
       },
-      "certifications": [
-        {
-          "name": "Food Handler Certificate",
-          "status": "pending",
-          "expiresOn": ""
-        }
-      ],
       "operatingHours": [
         {
           "day": "Mon",

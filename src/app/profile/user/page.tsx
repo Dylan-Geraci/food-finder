@@ -6,7 +6,6 @@ import { useRouter } from "next/navigation";
 import {
   Heart,
   Home,
-  LogOut,
   MapPin,
   MessageSquareText,
   Receipt,
@@ -58,7 +57,7 @@ function shortDate(iso: string): string {
 
 /** Diner dashboard — orders, saved kitchens, addresses, review history. */
 export default function DinerDashboardPage() {
-  const { status, user, logout, toggleFavorite } = useAuth();
+  const { status, user, toggleFavorite } = useAuth();
   const router = useRouter();
 
   // Guards: guests to the auth prompt, business accounts to their own portal
@@ -105,13 +104,6 @@ export default function DinerDashboardPage() {
             {user.joinedAt && ` · member since ${shortDate(user.joinedAt)}`}
           </p>
         </div>
-        <button
-          onClick={logout}
-          className="inline-flex items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-2 text-sm font-medium text-zinc-600 transition-colors hover:border-zinc-300 hover:text-zinc-900"
-        >
-          <LogOut size={14} />
-          Log out
-        </button>
       </div>
 
       {/* Stats */}

@@ -39,15 +39,6 @@ const OperatingHoursSchema = new Schema(
   { _id: false }
 );
 
-const CertificationSchema = new Schema(
-  {
-    name: { type: String, required: true },
-    status: { type: String, enum: ["verified", "pending"], default: "pending" },
-    expiresOn: { type: String, default: "" }, // ISO date or empty while pending
-  },
-  { _id: false }
-);
-
 const CookProfileSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, unique: true },
@@ -61,7 +52,6 @@ const CookProfileSchema = new Schema(
       lng: { type: Number, required: true },
       label: { type: String, default: "" },
     },
-    certifications: { type: [CertificationSchema], default: [] },
     operatingHours: { type: [OperatingHoursSchema], default: [] },
     cuisines: { type: [String], default: [] },
     // Denormalized aggregates maintained by the rating engine so map

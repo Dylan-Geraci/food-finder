@@ -2,7 +2,7 @@
 
 import { use } from "react";
 import Link from "next/link";
-import { ArrowLeft, BadgeCheck, CalendarClock, Clock, MapPin } from "lucide-react";
+import { ArrowLeft, CalendarClock, Clock, MapPin } from "lucide-react";
 import { useFetch } from "@/hooks/useFetch";
 import { Avatar } from "@/components/Avatar";
 import { RatingStars } from "@/components/RatingStars";
@@ -19,7 +19,6 @@ interface CookDetail {
     banner: string;
     icon: string;
     location: { lat: number; lng: number; label: string };
-    certifications: { name: string; status: "verified" | "pending"; expiresOn: string }[];
     operatingHours: { day: string; open: string; close: string; closed: boolean }[];
     cuisines: string[];
     ratingAvg: number;
@@ -134,19 +133,6 @@ export default function CookProfilePage({
               className="rounded-sm border border-zinc-200 bg-zinc-50 px-2 py-1 text-xs font-medium text-zinc-700"
             >
               {c}
-            </span>
-          ))}
-          {cook.certifications.map((cert) => (
-            <span
-              key={cert.name}
-              className={`inline-flex items-center gap-1 rounded-sm border px-2 py-1 text-xs font-medium ${
-                cert.status === "verified"
-                  ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                  : "border-amber-200 bg-amber-50 text-amber-700"
-              }`}
-            >
-              {cert.status === "verified" ? <BadgeCheck size={13} /> : <Clock size={13} />}
-              {cert.name} ({cert.status})
             </span>
           ))}
         </div>

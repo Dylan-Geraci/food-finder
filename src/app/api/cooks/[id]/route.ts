@@ -74,7 +74,6 @@ export async function GET(
         banner: cook.banner ?? "",
         icon: cook.icon ?? "",
         location: cook.location,
-        certifications: cook.certifications,
         operatingHours: cook.operatingHours ?? [],
         cuisines: cook.cuisines,
         ratingAvg: cook.ratingAvg,

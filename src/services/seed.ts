@@ -61,7 +61,6 @@ async function runSeed(): Promise<void> {
       banner: c.banner,
       icon: c.icon,
       location: c.location,
-      certifications: c.certifications,
       operatingHours: c.operatingHours,
       cuisines: c.cuisines,
       ratingAvg: 0.0,

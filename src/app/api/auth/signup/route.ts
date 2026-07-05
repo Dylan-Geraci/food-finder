@@ -23,9 +23,9 @@ function slugify(name: string): string {
 /**
  * POST /api/auth/signup — creates a real account in the database.
  * Body: { name, email, role: "diner" | "cook", kitchenName?, locationLabel? }
- * Kitchen accounts also get a CookProfile (pending certification, default
- * hours, location jittered around the city center) so they appear on the
- * map and in the grid immediately.
+ * Kitchen accounts also get a CookProfile (default hours, location
+ * jittered around the city center) so they appear on the map and in the
+ * grid immediately.
  */
 export async function POST(req: Request) {
   try {
@@ -72,7 +72,6 @@ export async function POST(req: Request) {
           lng: center.lng + (Math.random() - 0.5) * 0.05,
           label: (body.locationLabel ?? "").toString().trim() || mockData.city.name,
         },
-        certifications: [{ name: "Food Handler Certificate", status: "pending", expiresOn: "" }],
         operatingHours: DEFAULT_HOURS,
         cuisines: ["Home Cooking"],
         ratingAvg: 0.0,

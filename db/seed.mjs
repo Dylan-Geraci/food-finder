@@ -75,7 +75,6 @@ const cookDocs = mock.cookProfiles.map((c) => ({
   banner: c.banner ?? "",
   icon: c.icon ?? "",
   location: c.location,
-  certifications: c.certifications,
   operatingHours: c.operatingHours,
   cuisines: c.cuisines,
   ratingAvg: 0.0,

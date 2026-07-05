@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, BadgeCheck, Clock, Heart, MapPin, X } from "lucide-react";
+import { ArrowRight, Clock, Heart, MapPin, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
 import { useFetch } from "@/hooks/useFetch";
 import { Avatar } from "./Avatar";
@@ -17,7 +17,6 @@ interface QuickViewData {
     banner: string;
     icon: string;
     location: { lat: number; lng: number; label: string };
-    certifications: { name: string; status: "verified" | "pending"; expiresOn: string }[];
     cuisines: string[];
     ratingAvg: number;
     ratingCount: number;
@@ -163,27 +162,6 @@ export function QuickViewSheet({
                   </span>
                 ))}
               </div>
-
-              <ul className="mt-4 space-y-1.5">
-                {cook.certifications.map((cert) => (
-                  <li
-                    key={cert.name}
-                    className={`flex items-center gap-1.5 text-[13px] font-medium ${
-                      cert.status === "verified" ? "text-emerald-700" : "text-amber-700"
-                    }`}
-                  >
-                    {cert.status === "verified" ? (
-                      <BadgeCheck size={15} />
-                    ) : (
-                      <Clock size={15} />
-                    )}
-                    {cert.name}
-                    <span className="font-normal text-zinc-400">
-                      {cert.status === "verified" ? "· verified" : "· pending"}
-                    </span>
-                  </li>
-                ))}
-              </ul>
 
               <h3 className="mt-6 mb-3 text-sm font-bold uppercase tracking-wider text-zinc-400">
                 Menu ({data.meals.length})

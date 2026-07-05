@@ -87,7 +87,7 @@ throughout — no emoji.
   (hover transitions, price tags, dietary labels, cook times), a horizontal
   kitchens rail, and an embedded auto-populated neighborhood map. Meal and
   kitchen cards open a **Quick View** sheet (right panel on desktop, bottom
-  drawer on mobile) with the cook's profile, certifications, and menu.
+  drawer on mobile) with the cook's profile and menu.
 - **Auth &amp; dual profiles** — three session states (guest / Diner / Business)
   managed by `src/context/AuthContext.tsx`. Guests get Log In / Sign Up
   entries in the navbar and hero (modal with account-type selection); login
@@ -95,12 +95,11 @@ throughout — no emoji.
   CookProfile and appear on the map instantly). `/profile` routes each role
   to its own dashboard: `/profile/user` (order history, saved kitchens,
   addresses, review center) and `/profile/business` (incoming order queue
-  with status transitions, meal listing CRUD, operating hours, certification
-  status, and a 1.0-5.0 rating distribution analytics panel).
+  with status transitions, meal listing CRUD, operating hours, and a
+  1.0-5.0 rating distribution analytics panel).
 - **Profiles** — every user is a `diner` or `cook`; cooks get a `CookProfile`
-  with kitchen name, bio, geo location, cuisines, and food-safety
-  certification placeholders. The Profile tab switches between seeded
-  accounts (mock auth).
+  with kitchen name, bio, geo location, and cuisines. The Profile tab
+  switches between seeded accounts (mock auth).
 - **Rating engine** (`src/services/rating.ts`) — pure float math for 1.0–5.0
   star reviews: clamped input, guarded averages (**0 reviews → `0.0`, never
   `NaN`** — displayed as "New"), display rounding, and distribution
