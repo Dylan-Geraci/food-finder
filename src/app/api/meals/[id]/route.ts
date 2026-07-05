@@ -28,6 +28,7 @@ export async function PATCH(
       update.title = body.title.trim().slice(0, 120);
     if (typeof body.description === "string")
       update.description = body.description.trim().slice(0, 600);
+    if (Array.isArray(body.tags)) update.tags = body.tags.slice(0, 6).map(String);
     if (Array.isArray(body.photos)) {
       const photos = body.photos.filter(isMediaString).filter(Boolean).slice(0, 2);
       update.photos = photos;

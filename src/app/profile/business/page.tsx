@@ -23,7 +23,7 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useFetch } from "@/hooks/useFetch";
 import { Avatar } from "@/components/Avatar";
-import { MediaUpload } from "@/components/MediaUpload";
+import { MealFormModal, type MealFormTarget } from "@/components/MealForm";
 import { RatingStars } from "@/components/RatingStars";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
 import { OrderDetailModal, type OrderDetail } from "@/components/OrderDetailModal";
@@ -47,10 +47,12 @@ interface KitchenDetail {
   meals: {
     id: string;
     title: string;
+    description: string;
     price: number;
     prepMinutes: number;
     image: string;
     photos: string[];
+    tags: string[];
     servingsLeft: number;
     available: boolean;
     ratingAvg: number;
@@ -77,9 +79,6 @@ interface ReviewRow {
   stars: number;
 }
 
-const inputClass =
-  "w-full rounded-md border border-zinc-200 bg-white px-3 py-2 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-accent-600 focus:outline-none";
-
 function timeLabel(iso: string): string {
   const mins = Math.floor((Date.now() - new Date(iso).getTime()) / 60000);
   if (mins < 60) return `${Math.max(1, mins)} min ago`;
@@ -94,10 +93,7 @@ export default function BusinessDashboardPage() {
   const router = useRouter();
   const [busyId, setBusyId] = useState<string | null>(null);
   const [selectedOrder, setSelectedOrder] = useState<OrderDetail | null>(null);
-  const [showAddMeal, setShowAddMeal] = useState(false);
-  const [newMeal, setNewMeal] = useState({ title: "", price: "", prepMinutes: "30", servings: "5", description: "" });
-  const [newMealPhotos, setNewMealPhotos] = useState<[string, string]>(["", ""]);
-  const [formError, setFormError] = useState<string | null>(null);
+  const [mealForm, setMealForm] = useState<MealFormTarget | null>(null);
 
   // Guards: guests to the auth prompt, diner accounts to their own portal
   useEffect(() => {
@@ -163,33 +159,6 @@ export default function BusinessDashboardPage() {
     setBusyId(id);
     await fetch(`/api/meals/${id}`, { method: "DELETE" });
     setBusyId(null);
-    refetchKitchen();
-  }
-
-  async function addMeal(e: React.FormEvent) {
-    e.preventDefault();
-    setFormError(null);
-    const res = await fetch("/api/meals", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        cookId,
-        title: newMeal.title,
-        price: Number(newMeal.price),
-        prepMinutes: Number(newMeal.prepMinutes),
-        servingsLeft: Number(newMeal.servings),
-        description: newMeal.description,
-        photos: newMealPhotos.filter(Boolean),
-      }),
-    });
-    const json = await res.json();
-    if (!res.ok) {
-      setFormError(json.error ?? "Failed to create meal");
-      return;
-    }
-    setNewMeal({ title: "", price: "", prepMinutes: "30", servings: "5", description: "" });
-    setNewMealPhotos(["", ""]);
-    setShowAddMeal(false);
     refetchKitchen();
   }
 
@@ -387,91 +356,13 @@ export default function BusinessDashboardPage() {
                 Meal listings ({meals.length})
               </h2>
               <button
-                onClick={() => setShowAddMeal((s) => !s)}
+                onClick={() => setMealForm({ mode: "create" })}
                 className="inline-flex items-center gap-1.5 rounded-md bg-accent-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-accent-700"
               >
                 <ListPlus size={14} />
-                {showAddMeal ? "Close" : "New listing"}
+                New listing
               </button>
             </div>
-
-            {showAddMeal && (
-              <form
-                onSubmit={addMeal}
-                className="mb-4 space-y-3 rounded-md border border-zinc-200 bg-white p-4 shadow-sm"
-              >
-                <input
-                  value={newMeal.title}
-                  onChange={(e) => setNewMeal({ ...newMeal, title: e.target.value })}
-                  placeholder="Meal title"
-                  required
-                  className={inputClass}
-                />
-                <div className="grid grid-cols-3 gap-2">
-                  <input
-                    value={newMeal.price}
-                    onChange={(e) => setNewMeal({ ...newMeal, price: e.target.value })}
-                    placeholder="Price ($)"
-                    type="number"
-                    min="0"
-                    step="0.5"
-                    required
-                    className={inputClass}
-                  />
-                  <input
-                    value={newMeal.prepMinutes}
-                    onChange={(e) => setNewMeal({ ...newMeal, prepMinutes: e.target.value })}
-                    placeholder="Prep (min)"
-                    type="number"
-                    min="0"
-                    className={inputClass}
-                  />
-                  <input
-                    value={newMeal.servings}
-                    onChange={(e) => setNewMeal({ ...newMeal, servings: e.target.value })}
-                    placeholder="Servings"
-                    type="number"
-                    min="0"
-                    className={inputClass}
-                  />
-                </div>
-                <textarea
-                  value={newMeal.description}
-                  onChange={(e) => setNewMeal({ ...newMeal, description: e.target.value })}
-                  placeholder="Description"
-                  rows={2}
-                  className={inputClass}
-                />
-                {/* Up to two dish photos; the first is the cover */}
-                <div className="grid grid-cols-2 gap-3">
-                  <MediaUpload
-                    label="Cover photo"
-                    value={newMealPhotos[0]}
-                    onChange={(v) => setNewMealPhotos(([, p2]) => [v, p2])}
-                    maxDim={1200}
-                    aspectClass="aspect-[4/3]"
-                  />
-                  <MediaUpload
-                    label="Second photo (optional)"
-                    value={newMealPhotos[1]}
-                    onChange={(v) => setNewMealPhotos(([p1]) => [p1, v])}
-                    maxDim={1200}
-                    aspectClass="aspect-[4/3]"
-                  />
-                </div>
-                {formError && (
-                  <p className="rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-700">
-                    {formError}
-                  </p>
-                )}
-                <button
-                  type="submit"
-                  className="w-full rounded-md bg-zinc-900 py-2 text-sm font-semibold text-white transition-colors hover:bg-zinc-700"
-                >
-                  Publish listing
-                </button>
-              </form>
-            )}
 
             <ul className="divide-y divide-zinc-200 rounded-md border border-zinc-200 bg-white shadow-sm">
               {meals.map((m) => (
@@ -529,6 +420,16 @@ export default function BusinessDashboardPage() {
                     }`}
                   >
                     {m.available ? "Live" : "Paused"}
+                  </button>
+
+                  <button
+                    disabled={busyId === m.id}
+                    onClick={() => setMealForm({ mode: "edit", meal: m })}
+                    aria-label={`Edit ${m.title}`}
+                    title={`Edit ${m.title}`}
+                    className="rounded-md border border-zinc-200 p-1.5 text-zinc-500 transition-colors hover:border-zinc-300 hover:text-zinc-900 disabled:opacity-40"
+                  >
+                    <Pencil size={14} />
                   </button>
 
                   <button
@@ -606,6 +507,12 @@ export default function BusinessDashboardPage() {
         order={selectedOrder}
         perspective="kitchen"
         onClose={() => setSelectedOrder(null)}
+      />
+      <MealFormModal
+        target={mealForm}
+        cookId={cookId}
+        onClose={() => setMealForm(null)}
+        onSaved={refetchKitchen}
       />
     </main>
   );
