@@ -2,7 +2,8 @@
 
 import { use } from "react";
 import Link from "next/link";
-import { ArrowLeft, CalendarClock, Clock, MapPin } from "lucide-react";
+import { ArrowLeft, CalendarClock, Clock, MapPin, Plus } from "lucide-react";
+import { useOrder } from "@/context/OrderContext";
 import { useFetch } from "@/hooks/useFetch";
 import { Avatar } from "@/components/Avatar";
 import { RatingStars } from "@/components/RatingStars";
@@ -49,6 +50,7 @@ export default function CookProfilePage({
 }) {
   const { id } = use(params);
   const { data, loading, error, refetch } = useFetch<CookDetail>(`/api/cooks/${id}`);
+  const { requestOrder, canOrder } = useOrder();
 
   if (loading) {
     return (
@@ -224,6 +226,26 @@ export default function CookProfilePage({
                     </span>
                   ))}
                 </div>
+              )}
+              {canOrder && m.available && m.servingsLeft > 0 && (
+                <button
+                  type="button"
+                  onClick={() =>
+                    requestOrder({
+                      mealId: m.id,
+                      title: m.title,
+                      price: m.price,
+                      image: m.photos[0] ?? m.image,
+                      servingsLeft: m.servingsLeft,
+                      prepMinutes: m.prepMinutes,
+                      kitchenName: cook.kitchenName,
+                    })
+                  }
+                  className="mt-3 inline-flex w-full items-center justify-center gap-1.5 rounded-md bg-zinc-900 py-2 text-sm font-semibold text-white transition-colors hover:bg-accent-600 focus-visible:outline-2 focus-visible:outline-accent-600"
+                >
+                  <Plus size={14} />
+                  Order · ${m.price.toFixed(2)}
+                </button>
               )}
             </div>
           </article>

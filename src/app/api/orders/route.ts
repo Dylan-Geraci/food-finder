@@ -47,8 +47,10 @@ export async function GET(req: Request) {
       orders: orders.map((o) => ({
         id: String(o._id),
         qty: o.qty,
+        priceEach: o.priceEach || (o.qty ? o.total / o.qty : 0),
         total: o.total,
         type: o.type,
+        note: o.note ?? "",
         status: o.status,
         placedAt: o.placedAt,
         mealId: String(o.mealId),
@@ -62,5 +64,79 @@ export async function GET(req: Request) {
   } catch (err) {
     console.error("[api/orders]", err);
     return NextResponse.json({ error: "Failed to load orders" }, { status: 500 });
+  }
+}
+
+/**
+ * POST /api/orders — place an order (no payment processing in the MVP).
+ * Body: { mealId, dinerKey, qty, type: "pickup" | "delivery", note? }
+ */
+export async function POST(req: Request) {
+  try {
+    await connectDb();
+    const body = (await req.json()) ?? {};
+    const mealId = (body.mealId ?? "").toString();
+    const dinerKey = (body.dinerKey ?? "").toString();
+    const qty = Number(body.qty);
+    const type = body.type === "delivery" ? "delivery" : "pickup";
+    const note = (body.note ?? "").toString().trim().slice(0, 300);
+
+    if (!mealId || !dinerKey || !Number.isInteger(qty) || qty < 1 || qty > 20) {
+      return NextResponse.json(
+        { error: "mealId, dinerKey and a quantity between 1 and 20 are required" },
+        { status: 400 }
+      );
+    }
+
+    const diner = await User.findOne({ key: dinerKey }).lean();
+    if (!diner) return NextResponse.json({ error: "Account not found" }, { status: 404 });
+    if (diner.role !== "diner") {
+      return NextResponse.json(
+        { error: "Business accounts can't place orders" },
+        { status: 403 }
+      );
+    }
+
+    // Atomically claim servings so two diners can't oversell a dish
+    const meal = await Meal.findOneAndUpdate(
+      { _id: mealId, available: true, servingsLeft: { $gte: qty } },
+      { $inc: { servingsLeft: -qty } },
+      { new: true }
+    ).lean();
+    if (!meal) {
+      return NextResponse.json(
+        { error: "Not enough servings left — lower the quantity or check back later" },
+        { status: 409 }
+      );
+    }
+
+    const order = await Order.create({
+      dinerId: diner._id,
+      cookId: meal.cookId,
+      mealId: meal._id,
+      qty,
+      priceEach: meal.price,
+      total: Math.round(meal.price * qty * 100) / 100,
+      type,
+      note,
+      status: "pending",
+      placedAt: new Date(),
+    });
+
+    return NextResponse.json(
+      {
+        ok: true,
+        order: {
+          id: String(order._id),
+          status: order.status,
+          total: order.total,
+          servingsLeft: meal.servingsLeft,
+        },
+      },
+      { status: 201 }
+    );
+  } catch (err) {
+    console.error("[api/orders POST]", err);
+    return NextResponse.json({ error: "Failed to place order" }, { status: 500 });
   }
 }

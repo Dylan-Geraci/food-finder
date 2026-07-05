@@ -2,8 +2,9 @@
 
 import { useEffect } from "react";
 import Link from "next/link";
-import { ArrowRight, Clock, Heart, MapPin, X } from "lucide-react";
+import { ArrowRight, Clock, Heart, MapPin, Plus, X } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { useOrder } from "@/context/OrderContext";
 import { useFetch } from "@/hooks/useFetch";
 import { Avatar } from "./Avatar";
 import { RatingStars } from "./RatingStars";
@@ -50,6 +51,7 @@ export function QuickViewSheet({
     cookId ? `/api/cooks/${cookId}` : null
   );
   const { user, toggleFavorite } = useAuth();
+  const { requestOrder, canOrder } = useOrder();
   const open = cookId !== null;
   const isFavorite = !!cookId && !!user?.favoriteCookIds.includes(cookId);
 
@@ -167,47 +169,83 @@ export function QuickViewSheet({
                 Menu ({data.meals.length})
               </h3>
               <ul className="space-y-2.5">
-                {data.meals.map((m) => (
-                  <li
-                    key={m.id}
-                    className={`flex items-center gap-3 rounded-md border border-zinc-200 p-2.5 ${
-                      m.available ? "" : "opacity-55"
-                    }`}
-                  >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={m.image}
-                      alt={m.title}
-                      loading="lazy"
-                      className="h-14 w-14 shrink-0 rounded-sm object-cover"
-                    />
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm font-semibold text-zinc-900">
-                        {m.title}
-                      </p>
-                      <p className="mt-0.5 flex items-center gap-2 text-xs text-zinc-500">
-                        <span className="font-semibold text-zinc-900">
-                          ${m.price.toFixed(2)}
+                {data.meals.map((m) => {
+                  const orderable = canOrder && m.available && m.servingsLeft > 0;
+                  const row = (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={m.image}
+                        alt={m.title}
+                        loading="lazy"
+                        className="h-14 w-14 shrink-0 rounded-sm object-cover"
+                      />
+                      <span className="min-w-0 flex-1">
+                        <span className="block truncate text-sm font-semibold text-zinc-900">
+                          {m.title}
                         </span>
-                        <span className="inline-flex items-center gap-1">
-                          <Clock size={11} />
-                          {m.prepMinutes} min
-                        </span>
-                        {!m.available && (
-                          <span className="font-semibold uppercase text-zinc-400">
-                            Sold out
+                        <span className="mt-0.5 flex items-center gap-2 text-xs text-zinc-500">
+                          <span className="font-semibold text-zinc-900">
+                            ${m.price.toFixed(2)}
                           </span>
-                        )}
-                      </p>
-                    </div>
-                    <RatingStars
-                      avg={m.ratingAvg}
-                      count={m.ratingCount}
-                      size={11}
-                      showCount={false}
-                    />
-                  </li>
-                ))}
+                          <span className="inline-flex items-center gap-1">
+                            <Clock size={11} />
+                            {m.prepMinutes} min
+                          </span>
+                          {!m.available && (
+                            <span className="font-semibold uppercase text-zinc-400">
+                              Sold out
+                            </span>
+                          )}
+                        </span>
+                      </span>
+                      <RatingStars
+                        avg={m.ratingAvg}
+                        count={m.ratingCount}
+                        size={11}
+                        showCount={false}
+                      />
+                    </>
+                  );
+                  return (
+                    <li key={m.id}>
+                      {orderable ? (
+                        /* Clicking a menu item starts an order */
+                        <button
+                          type="button"
+                          onClick={() =>
+                            requestOrder({
+                              mealId: m.id,
+                              title: m.title,
+                              price: m.price,
+                              image: m.image,
+                              servingsLeft: m.servingsLeft,
+                              prepMinutes: m.prepMinutes,
+                              kitchenName: cook.kitchenName,
+                            })
+                          }
+                          className="flex w-full items-center gap-3 rounded-md border border-zinc-200 p-2.5 text-left transition-colors hover:border-accent-600 hover:bg-accent-50/40 focus-visible:outline-2 focus-visible:outline-accent-600"
+                        >
+                          {row}
+                          <span
+                            aria-hidden
+                            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md border border-zinc-200 bg-white text-zinc-500"
+                          >
+                            <Plus size={13} />
+                          </span>
+                        </button>
+                      ) : (
+                        <div
+                          className={`flex items-center gap-3 rounded-md border border-zinc-200 p-2.5 ${
+                            m.available && m.servingsLeft > 0 ? "" : "opacity-55"
+                          }`}
+                        >
+                          {row}
+                        </div>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
             </>
           )}

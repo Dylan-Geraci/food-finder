@@ -115,8 +115,10 @@ const OrderSchema = new Schema(
     cookId: { type: Schema.Types.ObjectId, ref: "CookProfile", required: true, index: true },
     mealId: { type: Schema.Types.ObjectId, ref: "Meal", required: true },
     qty: { type: Number, required: true, min: 1 },
+    priceEach: { type: Number, default: 0, min: 0 }, // unit price at order time
     total: { type: Number, required: true, min: 0 },
     type: { type: String, enum: ["pickup", "delivery"], default: "pickup" },
+    note: { type: String, default: "" }, // diner's special request to the kitchen
     status: { type: String, enum: ORDER_STATUSES, default: "pending", index: true },
     placedAt: { type: Date, default: Date.now },
   },
