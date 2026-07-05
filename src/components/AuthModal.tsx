@@ -110,7 +110,7 @@ export function AuthModal() {
         {/* Header + tabs */}
         <div className="flex items-center justify-between border-b border-zinc-200 px-5 py-4">
           <span className="text-lg font-extrabold tracking-tight text-zinc-900">
-            Fable<span className="text-accent-600">Fare</span>
+            Home<span className="text-accent-600">Plate</span>
           </span>
           <button
             onClick={closeAuth}

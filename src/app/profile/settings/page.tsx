@@ -11,7 +11,7 @@ import { MediaUpload } from "@/components/MediaUpload";
 const inputClass =
   "w-full rounded-md border border-zinc-200 bg-white px-3 py-2.5 text-sm text-zinc-900 placeholder:text-zinc-400 focus:border-accent-600 focus:outline-none";
 
-const PREFS_KEY = "fablefare.prefs";
+const PREFS_KEY = "homeplate.prefs";
 
 interface Prefs {
   orderUpdates: boolean;

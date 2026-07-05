@@ -1,6 +1,6 @@
-# FableFare 🍲
+# HomePlate
 
-A hyper-local marketplace for **home-cooked meals** — a dedicated space for
+A local marketplace for **home-cooked meals** — a dedicated space for
 neighborhood cooks and hungry diners, without the clutter of generalized
 marketplaces.
 

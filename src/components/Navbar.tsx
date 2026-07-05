@@ -18,7 +18,7 @@ export function Navbar() {
     <header className="border-b border-zinc-200 bg-white">
       <div className="mx-auto flex h-14 max-w-7xl items-center gap-4 px-4 sm:px-6">
         <Link href="/" className="text-lg font-extrabold tracking-tight text-zinc-900">
-          Fable<span className="text-accent-600">Fare</span>
+          Home<span className="text-accent-600">Plate</span>
         </Link>
 
         <span className="hidden items-center gap-1.5 rounded-md border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-700 sm:inline-flex">

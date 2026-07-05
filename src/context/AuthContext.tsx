@@ -77,7 +77,7 @@ const AuthContext = createContext<AuthContextValue>({
   closeAuth: () => {},
 });
 
-const STORAGE_KEY = "fablefare.auth.email";
+const STORAGE_KEY = "homeplate.auth.email";
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [status, setStatus] = useState<AuthStatus>("loading");

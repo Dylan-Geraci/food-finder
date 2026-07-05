@@ -13,9 +13,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "FableFare — Home-cooked meals near you",
+  title: "HomePlate — Home-cooked meals near you",
   description:
-    "A hyper-local marketplace for home-cooked meals: find real cooks in your neighborhood, not marketplace clutter.",
+    "A local marketplace for home-cooked meals: find real cooks in your neighborhood, not marketplace clutter.",
 };
 
 export const viewport: Viewport = {

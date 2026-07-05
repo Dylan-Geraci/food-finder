@@ -65,7 +65,7 @@ export async function POST(req: Request) {
       await CookProfile.create({
         userId: user._id,
         kitchenName: (body.kitchenName ?? "").toString().trim() || `${name}'s Kitchen`,
-        bio: "New kitchen on FableFare — menu coming together now.",
+        bio: "New kitchen on HomePlate — menu coming together now.",
         portrait: "",
         location: {
           lat: center.lat + (Math.random() - 0.5) * 0.05,

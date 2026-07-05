@@ -104,7 +104,7 @@ export default function LandingPage() {
               near you.
             </h1>
             <p className="mt-4 max-w-md text-[15px] leading-relaxed text-zinc-500">
-              Skip the marketplace clutter. FableFare is built for one thing:
+              Skip the marketplace clutter. HomePlate is built for one thing:
               connecting you with amazing home cooks in your neighborhood.
             </p>
 
@@ -300,7 +300,7 @@ export default function LandingPage() {
       <footer className="border-t border-zinc-200 bg-zinc-50">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-sm text-zinc-400 sm:flex-row sm:px-6">
           <span className="font-semibold text-zinc-500">
-            Fable<span className="text-accent-600">Fare</span>
+            Home<span className="text-accent-600">Plate</span>
           </span>
           <span>Home-cooked meal marketplace MVP &middot; Orange County &amp; Los Angeles</span>
         </div>

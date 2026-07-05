@@ -29,7 +29,7 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   providers,
   // Dev fallback so unconfigured installs never crash the route; set a
   // real AUTH_SECRET (npx auth secret) before enabling any provider.
-  secret: process.env.AUTH_SECRET ?? "fablefare-dev-only-secret-set-AUTH_SECRET",
+  secret: process.env.AUTH_SECRET ?? "homeplate-dev-only-secret-set-AUTH_SECRET",
   trustHost: true,
   callbacks: {
     // Bridge point for going live: upsert a User document here by
