@@ -5,6 +5,7 @@ import { AuthProvider } from "@/context/AuthContext";
 import { OrderProvider } from "@/context/OrderContext";
 import { Navbar } from "@/components/Navbar";
 import { BottomNav } from "@/components/BottomNav";
+import { SiteFooter } from "@/components/SiteFooter";
 import { AuthModal } from "@/components/AuthModal";
 import { OrderModal } from "@/components/OrderModal";
 
@@ -33,7 +34,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <OrderProvider>
             <Navbar />
             {/* pb clears the mobile bottom tab bar; none needed at md+ */}
-            <div className="pb-16 md:pb-0">{children}</div>
+            <div className="pb-16 md:pb-0">
+              {children}
+              <SiteFooter />
+            </div>
             <BottomNav />
             <AuthModal />
             <OrderModal />

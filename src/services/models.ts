@@ -54,6 +54,29 @@ const HoursExceptionSchema = new Schema(
   { _id: false }
 );
 
+// California compliance settings for the kitchen's legal program (MEHKO
+// vs Cottage Food Class A/B). Statutory caps and tally math live in
+// services/compliance.ts; only the kitchen's own selections persist here.
+const ComplianceSchema = new Schema(
+  {
+    program: {
+      type: String,
+      enum: ["mehko", "cottage-a", "cottage-b"],
+      default: "mehko",
+    },
+    // 90 statewide (AB 1325); 60 where a county kept the stricter cap
+    weeklyMealCap: { type: Number, default: 90, min: 1 },
+    permitNumber: { type: String, default: "" },
+    permitAgency: { type: String, default: "" }, // issuing enforcement agency
+    permitStatus: {
+      type: String,
+      enum: ["unverified", "pending", "verified"],
+      default: "unverified",
+    },
+  },
+  { _id: false }
+);
+
 const CookProfileSchema = new Schema(
   {
     userId: { type: Schema.Types.ObjectId, ref: "User", required: true, unique: true },
@@ -70,6 +93,7 @@ const CookProfileSchema = new Schema(
     operatingHours: { type: [OperatingHoursSchema], default: [] }, // "General Hours"
     hoursExceptions: { type: [HoursExceptionSchema], default: [] },
     cuisines: { type: [String], default: [] },
+    compliance: { type: ComplianceSchema, default: () => ({}) },
     // Denormalized aggregates maintained by the rating engine so map
     // markers and cards render without an aggregation query.
     ratingAvg: { type: Number, default: 0.0 },
@@ -141,11 +165,46 @@ const OrderSchema = new Schema(
   { timestamps: false }
 );
 
+// A permit photo submitted for verification (Option A pipeline). The raw
+// extraction is stored separately from the review decision so the audit
+// trail survives: what the model read, then what the reviewer decided.
+const PermitDocumentSchema = new Schema(
+  {
+    cookId: { type: Schema.Types.ObjectId, ref: "CookProfile", required: true, index: true },
+    image: { type: String, required: true }, // compressed data URL (see services/media)
+    status: {
+      type: String,
+      enum: ["submitted", "approved", "rejected"],
+      default: "submitted",
+      index: true,
+    },
+    extracted: {
+      type: new Schema(
+        {
+          isPermitDocument: { type: Boolean, default: false },
+          permitNumber: { type: String, default: "" },
+          issuingAgency: { type: String, default: "" },
+          holderName: { type: String, default: "" },
+          expirationDate: { type: String, default: "" }, // "YYYY-MM-DD" or ""
+          confidence: { type: String, enum: ["", "low", "medium", "high"], default: "" },
+        },
+        { _id: false }
+      ),
+      default: null, // null = extraction unavailable (no key / failed)
+    },
+    reviewNote: { type: String, default: "" },
+    submittedAt: { type: Date, default: Date.now },
+    decidedAt: { type: Date, default: null },
+  },
+  { timestamps: false }
+);
+
 export type UserDoc = InferSchemaType<typeof UserSchema>;
 export type CookProfileDoc = InferSchemaType<typeof CookProfileSchema>;
 export type MealDoc = InferSchemaType<typeof MealSchema>;
 export type ReviewDoc = InferSchemaType<typeof ReviewSchema>;
 export type OrderDoc = InferSchemaType<typeof OrderSchema>;
+export type PermitDocumentDoc = InferSchemaType<typeof PermitDocumentSchema>;
 
 export const User: Model<UserDoc> =
   mongoose.models.User || mongoose.model<UserDoc>("User", UserSchema);
@@ -157,3 +216,6 @@ export const Review: Model<ReviewDoc> =
   mongoose.models.Review || mongoose.model<ReviewDoc>("Review", ReviewSchema);
 export const Order: Model<OrderDoc> =
   mongoose.models.Order || mongoose.model<OrderDoc>("Order", OrderSchema);
+export const PermitDocument: Model<PermitDocumentDoc> =
+  mongoose.models.PermitDocument ||
+  mongoose.model<PermitDocumentDoc>("PermitDocument", PermitDocumentSchema);

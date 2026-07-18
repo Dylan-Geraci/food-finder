@@ -6,9 +6,11 @@ import { ArrowLeft, CalendarClock, Clock, MapPin, Plus } from "lucide-react";
 import { useOrder } from "@/context/OrderContext";
 import { useFetch } from "@/hooks/useFetch";
 import { Avatar } from "@/components/Avatar";
+import { PermitBadge } from "@/components/ComplianceTracker";
 import { RatingStars } from "@/components/RatingStars";
 import { ReviewForm } from "@/components/ReviewForm";
 import { ReviewList, type ReviewData } from "@/components/ReviewList";
+import { PROGRAM_RULES, type ComplianceSettings } from "@/services/compliance";
 import { formatRating } from "@/services/rating";
 
 interface CookDetail {
@@ -26,6 +28,7 @@ interface CookDetail {
     ratingAvg: number;
     ratingCount: number;
     cookName: string;
+    compliance: ComplianceSettings;
   };
   meals: {
     id: string;
@@ -138,6 +141,33 @@ export default function CookProfilePage({
               {c}
             </span>
           ))}
+        </div>
+
+        {/* Dedicated permit posting — Cal. HSC § 114367.6 requires an IFSI
+            to give every home kitchen a place for its permit details. */}
+        <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1.5 rounded-md border border-trust-100 bg-trust-50 px-3 py-2.5">
+          <PermitBadge status={cook.compliance.permitStatus} />
+          <p className="text-xs leading-relaxed text-trust-700">
+            {cook.compliance.permitNumber ? (
+              <>
+                {PROGRAM_RULES[cook.compliance.program].label} permit{" "}
+                <span className="font-semibold text-trust-900">
+                  {cook.compliance.permitNumber}
+                </span>
+                {cook.compliance.permitAgency && (
+                  <> · issued by {cook.compliance.permitAgency}</>
+                )}
+              </>
+            ) : (
+              <>This kitchen hasn&apos;t posted its permit details yet.</>
+            )}{" "}
+            <Link
+              href="/legal/health-disclosure"
+              className="font-semibold text-trust-600 underline decoration-trust-200 underline-offset-2 hover:text-trust-800"
+            >
+              Prepared in a private home kitchen
+            </Link>
+          </p>
         </div>
 
         {cook.operatingHours.length > 0 && (

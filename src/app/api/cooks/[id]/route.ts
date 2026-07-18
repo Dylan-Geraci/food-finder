@@ -1,4 +1,11 @@
 import { NextResponse } from "next/server";
+import {
+  COMPLIANCE_PROGRAMS,
+  DEFAULT_COMPLIANCE,
+  WEEKLY_CAP_OPTIONS,
+  type ComplianceProgram,
+  type ComplianceSettings,
+} from "@/services/compliance";
 import { connectDb } from "@/services/db";
 import { isMediaString } from "@/services/media";
 import { CookProfile, Meal, Review, User } from "@/services/models";
@@ -53,6 +60,45 @@ function parseHoursExceptions(input: unknown) {
 }
 
 /**
+ * Validate a compliance-settings update against the previous state;
+ * null when malformed. `permitStatus` is never client-settable — the
+ * verification tier only moves through the (future) review pipeline:
+ * entering a new permit number lands it in "pending", clearing it
+ * drops back to "unverified".
+ */
+function parseCompliance(input: unknown, prev: ComplianceSettings) {
+  const row = input as Record<string, unknown> | undefined;
+  if (!row || typeof row !== "object") return null;
+
+  const program = row.program ?? prev.program;
+  if (!COMPLIANCE_PROGRAMS.includes(program as ComplianceProgram)) return null;
+
+  const weeklyMealCap = Number(row.weeklyMealCap ?? prev.weeklyMealCap);
+  if (!(WEEKLY_CAP_OPTIONS as readonly number[]).includes(weeklyMealCap)) return null;
+
+  const permitNumber =
+    typeof row.permitNumber === "string"
+      ? row.permitNumber.trim().slice(0, 40)
+      : prev.permitNumber;
+  const permitAgency =
+    typeof row.permitAgency === "string"
+      ? row.permitAgency.trim().slice(0, 80)
+      : prev.permitAgency;
+
+  let permitStatus = prev.permitStatus;
+  if (!permitNumber) permitStatus = "unverified";
+  else if (permitNumber !== prev.permitNumber) permitStatus = "pending";
+
+  return {
+    program: program as ComplianceProgram,
+    weeklyMealCap,
+    permitNumber,
+    permitAgency,
+    permitStatus,
+  } satisfies ComplianceSettings;
+}
+
+/**
  * PATCH /api/cooks/:id — kitchen identity + hours management.
  * Body (all optional): { kitchenName, bio, banner, icon, operatingHours,
  * hoursExceptions }. Media fields accept a compressed data URL, an
@@ -93,6 +139,23 @@ export async function PATCH(
         );
       }
       update.hoursExceptions = exceptions;
+    }
+    if ("compliance" in body) {
+      // Merging against current state needs the stored doc (older docs
+      // predate the compliance subdocument, so fall back to defaults).
+      const existing = await CookProfile.findById(id).select("compliance").lean();
+      if (!existing) {
+        return NextResponse.json({ error: "Kitchen not found" }, { status: 404 });
+      }
+      const prev = { ...DEFAULT_COMPLIANCE, ...(existing.compliance ?? {}) };
+      const compliance = parseCompliance(body.compliance, prev);
+      if (!compliance) {
+        return NextResponse.json(
+          { error: "Compliance settings must use a valid program and county weekly cap" },
+          { status: 400 }
+        );
+      }
+      update.compliance = compliance;
     }
 
     if (Object.keys(update).length === 0) {
@@ -149,6 +212,7 @@ export async function GET(
         ratingAvg: cook.ratingAvg,
         ratingCount: cook.ratingCount,
         cookName: user?.name ?? "Unknown cook",
+        compliance: { ...DEFAULT_COMPLIANCE, ...(cook.compliance ?? {}) },
       },
       meals: meals.map((m) => ({
         id: String(m._id),

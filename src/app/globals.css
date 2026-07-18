@@ -9,6 +9,34 @@
   --color-accent-700: #b53f06;
   --color-accent-800: #8f3407;
 
+  /* Legal & compliance system. `trust` is a deep slate-navy reserved for
+     legal surfaces (footer, legal pages, the compliance ledger) so
+     regulatory UI reads as a distinct, sober register from the terracotta
+     marketplace accent. `sage` marks within-limit gauge states; `cream`
+     is the warm surface behind statutorily required disclosures. */
+  --color-trust-50: #f4f6fa;
+  --color-trust-100: #e6ebf3;
+  --color-trust-200: #cdd8e7;
+  --color-trust-300: #a8bad2;
+  --color-trust-400: #7b94b6;
+  --color-trust-500: #58749a;
+  --color-trust-600: #435c7e;
+  --color-trust-700: #374b67;
+  --color-trust-800: #2b3a50;
+  --color-trust-900: #1c2737;
+  --color-trust-950: #131b27;
+
+  --color-sage-100: #e8eee4;
+  --color-sage-200: #d3ddcb;
+  --color-sage-500: #6d8560;
+  --color-sage-600: #57704b;
+  --color-sage-700: #47593d;
+
+  --color-cream-50: #fbf8f1;
+  --color-cream-100: #f6f0e3;
+  --color-cream-200: #ece1cb;
+  --color-cream-300: #ddcca9;
+
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Roboto, sans-serif;
 }

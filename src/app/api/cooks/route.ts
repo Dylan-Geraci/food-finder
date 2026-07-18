@@ -34,7 +34,17 @@ export async function GET() {
       ratingCount: c.ratingCount,
       activeMeals: mealCounts.get(String(c._id)) ?? 0,
       cookName: userById.get(String(c.userId))?.name ?? "Unknown cook",
+      permitStatus: c.compliance?.permitStatus ?? "unverified",
     }));
+
+    // Tiered-trust ranking: verified kitchens surface first, pending next
+    // — the distribution incentive behind the permit pipeline.
+    const tierRank = { verified: 0, pending: 1, unverified: 2 } as const;
+    payload.sort(
+      (a, b) =>
+        (tierRank[a.permitStatus as keyof typeof tierRank] ?? 2) -
+        (tierRank[b.permitStatus as keyof typeof tierRank] ?? 2)
+    );
 
     return NextResponse.json({ cooks: payload });
   } catch (err) {

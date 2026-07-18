@@ -23,6 +23,8 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { useFetch } from "@/hooks/useFetch";
 import { Avatar } from "@/components/Avatar";
+import { ComplianceTracker } from "@/components/ComplianceTracker";
+import type { ComplianceSettings } from "@/services/compliance";
 import { MealFormModal, type MealFormTarget } from "@/components/MealForm";
 import { RatingStars } from "@/components/RatingStars";
 import { OrderStatusBadge } from "@/components/OrderStatusBadge";
@@ -44,6 +46,7 @@ interface KitchenDetail {
     ratingAvg: number;
     ratingCount: number;
     cookName: string;
+    compliance: ComplianceSettings;
   };
   meals: {
     id: string;
@@ -231,6 +234,14 @@ export default function BusinessDashboardPage() {
           </div>
         ))}
       </div>
+
+      {/* California compliance ledger — private to this kitchen */}
+      <ComplianceTracker
+        cookId={cookId}
+        compliance={kitchen?.cook.compliance ?? null}
+        orders={orderData?.orders ?? null}
+        onSaved={refetchKitchen}
+      />
 
       <div className="mt-8 grid gap-8 lg:grid-cols-5">
         {/* Left column: queue + listings */}
