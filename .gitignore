@@ -11,3 +11,4 @@ db/mongodb-binaries/
 next-env.d.ts
 .DS_Store
 .claude/settings.local.json
+.claude/state/
