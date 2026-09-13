@@ -19,6 +19,14 @@ All git work in this repo must be attributed to **Dylan Geraci's** GitHub accoun
 - Only run `git add`, `git commit`, or `git push` when explicitly asked to. When you
   do, the above rules apply with no exceptions.
 
+Both of these are also enforced at the settings level, not just by instruction —
+`.claude/settings.json` sets `permissions.ask` on `git add`/`commit`/`push` (forces
+an explicit approval prompt every time, regardless of permission mode) and
+`attribution.commit`/`attribution.pr` to empty strings (suppresses any Claude/
+Anthropic attribution trailer at the harness level). If either setting is ever
+missing after a `.claude/settings.json` edit, restore it — don't rely on the
+instruction alone.
+
 Before committing, sanity-check the identity:
 
 ```bash
