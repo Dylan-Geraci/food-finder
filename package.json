@@ -8,7 +8,8 @@
     "build": "next build",
     "start": "next start",
     "seed": "node db/seed.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepare": "husky"
   },
   "dependencies": {
     "lucide-react": "^1.23.0",
@@ -25,6 +26,7 @@
     "@types/node": "^22.15.0",
     "@types/react": "^19.1.0",
     "@types/react-dom": "^19.1.0",
+    "husky": "^9.1.7",
     "tailwindcss": "^4.1.10",
     "typescript": "^5.8.3"
   }
