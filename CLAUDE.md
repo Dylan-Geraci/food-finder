@@ -171,6 +171,45 @@ cook profiles and recomputed on every `POST /api/reviews`.
 
 ---
 
+## Delegating to subagents
+
+`.claude/agents/` defines four subagents (`locator`, `api-route-agent`,
+`ui-component-agent`, `domain-logic-agent`) — see `.claude/agents/README.md`
+for the full model/tooling rationale. Ownership is by file path, not by
+task description:
+
+| If the work touches... | Delegate to |
+|---|---|
+| `src/app/api/**/route.ts` | `api-route-agent` |
+| `src/components/**`, `src/app/**/*.tsx` (pages) | `ui-component-agent` |
+| `src/services/**` (models, compliance, rating, auth, seeding) | `domain-logic-agent` |
+| A pure lookup — "where is X," "find usages of Y" — before any of the above | `locator` |
+| Anything outside those paths (config, `db/seed.mjs`, `.husky/`, docs) | the built-in `general-purpose` agent type — no dedicated file for this on purpose, see below |
+
+Rules:
+- **Route by file path, not vibes.** If a task is "add an endpoint that
+  changes a Mongoose schema," that's two delegations (`domain-logic-agent`
+  for the schema, `api-route-agent` for the route), not one agent doing
+  both off-scope.
+- **Lookups go through `locator` first.** It's pinned to `haiku` — using it
+  for pure search before reasoning is the actual mechanism that saves
+  tokens; skipping it and re-grepping at full price in a bigger agent
+  defeats the point.
+- **No dedicated catch-all "coding agent."** Deliberately not added — a
+  generic agent becomes a dumping ground that ambiguous work gets routed to
+  out of convenience, which erodes the specialization (domain guardrails,
+  token tiering) the scoped agents exist for. The rare truly-uncategorized
+  edit (config, seed script, the pre-push hook itself) is infrequent enough
+  that the built-in `general-purpose` type handles it without a bespoke
+  file.
+- **No dedicated "orchestrator" agent.** Subagents don't spawn further
+  subagents — the orchestrator is whichever model (Sonnet/Opus) is driving
+  the current session. It reads this table and delegates directly. For a
+  genuinely multi-stage, deterministic pipeline, use the `Workflow` tool
+  explicitly rather than reaching for a standing orchestrator agent.
+
+---
+
 ## Conventions
 
 - UI uses **Lucide SVG icons** throughout — no emoji.
